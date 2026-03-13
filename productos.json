@@ -80,7 +80,9 @@
       "Gluten"
     ],
     "top": true,
-    "active": true
+    "active": true,
+    "imgUrl": "img/productos/arroz-tricantino.jpg",
+    "imgUploading": false
   },
   {
     "id": 6,
