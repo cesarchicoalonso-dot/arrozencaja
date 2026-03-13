@@ -32,7 +32,8 @@
     ],
     "top": false,
     "active": true,
-    "imgUrl": "img/productos/Arroz-de-tinta.jpg"
+    "imgUrl": "img/productos/Arroz-de-tinta.jpg",
+    "imgPos": "50% 68%"
   },
   {
     "id": 3,
@@ -47,7 +48,10 @@
       "Sulfitos"
     ],
     "top": false,
-    "active": true
+    "active": true,
+    "imgUrl": "img/productos/arroz-internacional.jpg",
+    "imgPos": "48% 44%",
+    "imgUploading": false
   },
   {
     "id": 4,
