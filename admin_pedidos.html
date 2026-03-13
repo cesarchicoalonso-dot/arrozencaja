@@ -325,7 +325,10 @@ function LoginScreen({onAuth}) {
   return (
     <div className="min-h-screen bg-dark flex items-center justify-center p-4">
       <div className="bg-dark-3 border border-white/10 rounded-2xl p-8 w-full max-w-sm text-center shadow-2xl">
-        <div className="text-2xl font-bold mb-1">
+        <img src="img/logotipo.png" alt="Arroz en Caja"
+          className="w-20 h-20 object-contain mx-auto mb-3"
+          onError={e=>{e.target.style.display='none';e.target.nextElementSibling.style.display='block'}}/>
+        <div className="text-2xl font-bold mb-1 hidden">
           arroz<span className="text-brand">·en·</span>caja
         </div>
         <div className="text-white/40 text-sm mb-8">Panel de administración</div>
@@ -1489,8 +1492,10 @@ function App() {
       {/* Topbar */}
       <header className="sticky top-0 z-40 bg-dark/95 backdrop-blur border-b border-white/5 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <a href="index.html" className="font-bold text-lg tracking-tight hover:opacity-80 transition-opacity">
-            arroz<span className="text-brand">·en·</span>caja
+          <a href="index.html" className="hover:opacity-80 transition-opacity flex items-center">
+            <img src="img/logotipo.png" alt="Arroz en Caja" className="h-9 w-9 object-contain"
+              onError={e=>{e.target.style.display='none';e.target.nextElementSibling.style.display='block'}}/>
+            <span className="font-bold text-lg tracking-tight hidden">arroz<span className="text-brand">·en·</span>caja</span>
           </a>
           <span className="hidden sm:block text-white/20">|</span>
           <span className="hidden sm:block text-sm text-white/50">Administración</span>

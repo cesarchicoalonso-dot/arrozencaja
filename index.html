@@ -4,7 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Arroz en Caja | Arroces, Fideuás y Mucho Más a Domicilio</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23C8830E'/><text y='72' x='50' text-anchor='middle' font-size='58'>🍚</text></svg>"/>
+<link rel="icon" href="img/logotipo.png"/>
+<link rel="apple-touch-icon" href="img/logotipo.png"/>
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23C8830E'/><text y='72' x='50' text-anchor='middle' font-size='58'>🍚</text></svg>"/>
 <meta name="description" content="Arroz en Caja — arroces artesanales, fideuás, smash burgers, empanadas y más. Recogida o entrega a domicilio en Colmenar Viejo, Tres Cantos y Ávila."/>
 <meta name="keywords" content="arroz en caja, paella domicilio, fideuá, smash burger, empanadas argentinas, colmenar viejo, tres cantos, ávila, comida a domicilio"/>
@@ -20,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Organization","name":"Arroz en Caja","url":"https://arrozencaja.com","logo":"https://arrozencaja.com/logo.png","sameAs":["https://www.instagram.com/arrozencaja","https://www.facebook.com/arrozencaja"],"contactPoint":[{"@type":"ContactPoint","telephone":"+34-918-450-000","contactType":"customer service"}]}
+{"@context":"https://schema.org","@type":"Organization","name":"Arroz en Caja","url":"https://arrozencaja.com","logo":"https://arrozencaja.com/img/logotipo.png","sameAs":["https://www.instagram.com/arrozencaja","https://www.facebook.com/arrozencaja"],"contactPoint":[{"@type":"ContactPoint","telephone":"+34-918-450-000","contactType":"customer service"}]}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"FoodEstablishment","name":"Arroz en Caja — Colmenar Viejo","address":{"@type":"PostalAddress","streetAddress":"C/ Sombrerero, 24","addressLocality":"Colmenar Viejo","postalCode":"28770","addressCountry":"ES"},"telephone":"+34-918-450-000","openingHours":["Mo-Su 12:00-16:00","Mo-Su 20:00-23:00"],"geo":{"@type":"GeoCoordinates","latitude":40.6667,"longitude":-3.7667},"servesCuisine":"Spanish"},{"@type":"FoodEstablishment","name":"Arroz en Caja — Tres Cantos","address":{"@type":"PostalAddress","streetAddress":"C/ de los Castillos, 8","addressLocality":"Tres Cantos","postalCode":"28760","addressCountry":"ES"},"telephone":"+34-918-031-122","openingHours":["Mo-Su 12:00-16:00","Mo-Su 20:00-23:00"],"servesCuisine":"Spanish"},{"@type":"FoodEstablishment","name":"Arroz en Caja — Ávila","address":{"@type":"PostalAddress","streetAddress":"C/ Lope Núñez, 17","addressLocality":"Ávila","postalCode":"05001","addressCountry":"ES"},"telephone":"+34-920-253-300","openingHours":["Mo-Su 12:00-16:00","Mo-Su 20:00-23:00"],"servesCuisine":"Spanish"}]}
@@ -55,8 +56,26 @@ nav{position:fixed;top:0;left:0;width:100%;z-index:900;background:rgba(245,239,2
 nav.scrolled{box-shadow:0 2px 20px rgba(26,17,8,.1)}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 20px;max-width:1280px;margin:0 auto}
 @media(min-width:900px){.nav-inner{padding:0 40px}}
-.logo{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.15rem;color:var(--dark);white-space:nowrap}
-.logo span{color:var(--brand)}
+.logo{display:flex;align-items:center}
+.logo img{height:48px;width:48px;object-fit:contain;display:block}
+@media(min-width:900px){.logo img{height:52px;width:52px}}
+/* fallback texto (por si la imagen no carga) */
+.logo-txt{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.15rem;color:var(--dark);white-space:nowrap;display:none}
+.logo-txt span{color:var(--brand)}
+/* logo footer */
+.foot-logo-img{height:68px;width:68px;object-fit:contain;display:block;margin-bottom:14px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+/* logo overlay en hero — solo desktop */
+.hero-logo-badge{display:none}
+@media(min-width:900px){
+  .hero-logo-badge{
+    display:block;position:absolute;right:6%;bottom:48px;z-index:3;
+    width:148px;height:148px;object-fit:contain;
+    filter:drop-shadow(0 6px 24px rgba(0,0,0,.55));
+    opacity:.93;
+    transition:opacity .2s,transform .2s;
+  }
+  .hero-logo-badge:hover{opacity:1;transform:scale(1.03)}
+}
 /* desktop links */
 .nav-links{display:none}
 @media(min-width:900px){
@@ -102,7 +121,7 @@ nav.scrolled{box-shadow:0 2px 20px rgba(26,17,8,.1)}
 .ham.open span:nth-child(2){opacity:0;transform:scaleX(0)}
 .ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 /* mobile drawer */
-.drawer{position:fixed;inset:0;top:64px;z-index:800;background:var(--cream);transform:translateX(100%);transition:transform .35s cubic-bezier(.25,.46,.45,.94);padding:24px 20px;display:flex;flex-direction:column;overflow-y:auto}
+.drawer{position:fixed;inset:0;top:64px;z-index:900;background:var(--cream);transform:translateX(100%);transition:transform .35s cubic-bezier(.25,.46,.45,.94);padding:24px 20px;display:flex;flex-direction:column;overflow-y:auto}
 .drawer.open{transform:translateX(0)}
 .drawer-link{font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:700;color:var(--dark);padding:14px 0;border-bottom:1px solid var(--border);display:block;transition:color .2s}
 .drawer-link:hover{color:var(--brand)}
@@ -114,7 +133,9 @@ nav.scrolled{box-shadow:0 2px 20px rgba(26,17,8,.1)}
 .drawer-loc select{margin-top:8px;width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.9rem;background:var(--white);color:var(--dark);font-family:'Inter',sans-serif}
 
 /* ── HERO ── */
-.hero{position:relative;height:62vh;min-height:380px;max-height:600px;display:flex;align-items:flex-end;overflow:hidden;margin-top:64px}
+.hero{position:relative;height:50vh;min-height:300px;max-height:600px;display:flex;align-items:flex-end;overflow:hidden;margin-top:64px}
+@media(min-width:600px){.hero{height:58vh;min-height:340px}}
+@media(min-width:900px){.hero{height:68vh;min-height:420px}}
 /* Carrusel tipo marquee con pausa en el centro */
 .hero-marquee{position:absolute;inset:0;overflow:hidden;z-index:0}
 .hero-marquee-track{position:absolute;display:flex;height:100%;width:max-content;transition:transform 0s linear}
@@ -474,7 +495,10 @@ footer{background:#1A1108;color:#fff}
 <!-- ═══ NAV ═══ -->
 <nav id="nav">
   <div class="nav-inner">
-    <a href="#" class="logo">arroz<span>·en·</span>caja</a>
+    <a href="#" class="logo">
+      <img src="img/logotipo.png" alt="Arroz en Caja" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+      <span class="logo-txt">arroz<span>·en·</span>caja</span>
+    </a>
     <ul class="nav-links">
       <li><a href="#carta" onclick="setFilter('arroces')">Nuestros arroces</a></li>
       <li class="has-drop">
@@ -558,6 +582,8 @@ footer{background:#1A1108;color:#fff}
     </div>
   </div>
   <div class="hero-grad"></div>
+  <!-- Logo badge desktop (oculto en mobile) -->
+  <img src="img/logotipo.png" alt="Arroz en Caja" class="hero-logo-badge"/>
   <div class="hero-body container">
     <div class="hero-kicker"><i></i>ARROCES ARTESANALES · ENVÍO A DOMICILIO</div>
     <h1>El <em>mejor<br/>arroz,</em><br/>a tu puerta.</h1>
@@ -674,7 +700,7 @@ footer{background:#1A1108;color:#fff}
 <footer id="contacto">
   <div class="foot-main">
     <div>
-      <span class="foot-logo">arroz<span>·en·</span>caja</span>
+      <img src="img/logotipo.png" alt="Arroz en Caja" class="foot-logo-img" onerror="this.style.display='none'"/>
       <p class="foot-tagline">De nuestra especialidad y tus ganas de un buen arroz, ya está aquí el mejor plato.</p>
       <div class="foot-socials">
         <a href="#" class="soc-btn" aria-label="Facebook" rel="noopener">

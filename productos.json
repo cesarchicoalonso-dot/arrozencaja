@@ -32,7 +32,7 @@
     ],
     "top": false,
     "active": true,
-    "imgUrl": "img/productos/Arroz-de-tinta.jpg"
+    "imgUrl": ""
   },
   {
     "id": 3,
@@ -111,9 +111,7 @@
       "Gluten"
     ],
     "top": false,
-    "active": true,
-    "imgUrl": "img/productos/risotto.jpg",
-    "imgUploading": false
+    "active": true
   },
   {
     "id": 8,
@@ -582,7 +580,7 @@
     "id": 66,
     "cat": "empanadas",
     "name": "Empanada de Carne",
-    "price": 2.95,
+    "price": 3.5,
     "unit": "ud",
     "desc": "Masa casera rellena de carne picada y especias",
     "al": [
@@ -590,10 +588,7 @@
       "Huevos"
     ],
     "top": true,
-    "active": true,
-    "minR": null,
-    "imgUrl": "img/productos/empanadisimascarnesuave.jpg",
-    "imgUploading": false
+    "active": true
   },
   {
     "id": 67,
