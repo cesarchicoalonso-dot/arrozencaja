@@ -243,7 +243,9 @@
       "Pescado"
     ],
     "top": true,
-    "active": true
+    "active": true,
+    "imgUrl": "img/productos/arroz-marisquito.jpg",
+    "imgUploading": false
   },
   {
     "id": 16,
@@ -406,7 +408,9 @@
       "Gluten"
     ],
     "top": true,
-    "active": true
+    "active": true,
+    "imgUrl": "",
+    "imgUploading": true
   },
   {
     "id": 54,
@@ -422,7 +426,10 @@
       "Mostaza"
     ],
     "top": true,
-    "active": true
+    "active": true,
+    "minR": null,
+    "imgUrl": "",
+    "imgUploading": true
   },
   {
     "id": 55,
