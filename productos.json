@@ -186,7 +186,11 @@
       "Sulfitos"
     ],
     "top": true,
-    "active": true
+    "active": true,
+    "imgUrl": "img/productos/arroz-bogavante.jpg",
+    "imgPos": "51% 51%",
+    "imgZoom": 1.3,
+    "imgUploading": false
   },
   {
     "id": 12,
