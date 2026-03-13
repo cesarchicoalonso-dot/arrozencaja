@@ -345,7 +345,11 @@
       "Apio"
     ],
     "top": false,
-    "active": true
+    "active": true,
+    "imgUrl": "img/productos/fideua-de-rabo-de-toro.jpg",
+    "imgPos": "50% 50%",
+    "imgZoom": 1,
+    "imgUploading": false
   },
   {
     "id": 21,
