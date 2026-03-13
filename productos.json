@@ -111,7 +111,9 @@
       "Gluten"
     ],
     "top": false,
-    "active": true
+    "active": true,
+    "imgUrl": "img/productos/risotto.jpg",
+    "imgUploading": false
   },
   {
     "id": 8,
