@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Admin · arroz·en·caja</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { DEFAULT:'#E8A020', light:'#F5B942', dark:'#C47A10' },
+            dark:  { DEFAULT:'#1A1108', 2:'#231708', 3:'#2E1F0C' },
+          },
+          fontFamily: { sans:['Inter','system-ui','sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box}
+    body{background:#1A1108;font-family:'Inter',sans-serif}
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:#1A1108}
+    ::-webkit-scrollbar-thumb{background:#3E2810;border-radius:3px}
+    ::-webkit-scrollbar-thumb:hover{background:#E8A020}
+    select option{background:#2E1F0C;color:#fff}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback, useMemo, useRef } = React;
+
+/* ════════════════════════════════════════════════
+   CONSTANTES Y UTILIDADES
+   ════════════════════════════════════════════════ */
+const ORDERS_KEY   = 'aec_orders';
+const PRODUCTS_KEY = 'aec_products';
+const AUTH_KEY     = 'aec_auth';
+const REVIEWS_KEY  = 'aec_reviews';
+const DEFAULT_REVIEWS = [
+  {id:1,stars:5,text:'Pedimos para la comida de empresa de 25 personas y fue un éxito total. El arroz llegó perfecto, como recién hecho. Repetiremos sin duda.',author:'María L.',initials:'ML',meta:'Febrero 2026 · Tres Cantos'},
+  {id:2,stars:5,text:'La fideuá de marisco estaba espectacular. El envasado conserva el punto perfecto. Ya somos clientes fijos cada fin de semana.',author:'Javier R.',initials:'JR',meta:'Enero 2026 · Colmenar Viejo'},
+  {id:3,stars:5,text:'Las smash burgers están increíbles. Llevé varias a una fiesta y todos me preguntaban de dónde eran. Muy recomendable.',author:'Ana S.',initials:'AS',meta:'Marzo 2026 · Ávila'}
+];
+const ADMIN_PWD    = 'admin2026';
+
+const CAT_LABELS = {
+  arroces:'Arroces', fideuas:'Fideuás', smashburger:'Smash Burger',
+  lepain:'Le Pain', kajita:'K@jita Food', empanadas:'Empanadas Arg.',
+  asados:'Asados', postres:'Postres', bebidas:'Bebidas',
+  vinos:'Vinos y Vermús', gourmet:'Recetas Gourmet', extras:'Extras'
+};
+const CATS = Object.keys(CAT_LABELS);
+const UNITS = ['ud','rac','bot'];
+const ALLERGENS = ['Gluten','Crustáceos','Moluscos','Huevos','Lácteos','Pescado','Frutos secos','Mostaza','Sulfitos','Sésamo','Soja','Apio'];
+
+const ESTADOS_ORDER = ['Pendiente','En proceso','Enviado','Entregado','Cancelado'];
+const ESTADO_STYLE  = {
+  'Pendiente': 'bg-yellow-400/15 text-yellow-300 border-yellow-400/30',
+  'En proceso':'bg-blue-400/15 text-blue-300 border-blue-400/30',
+  'Enviado':   'bg-purple-400/15 text-purple-300 border-purple-400/30',
+  'Entregado': 'bg-green-400/15 text-green-300 border-green-400/30',
+  'Cancelado': 'bg-red-400/15 text-red-300 border-red-400/30',
+};
+const ESTADO_DOT = {
+  'Pendiente':'bg-yellow-400','En proceso':'bg-blue-400',
+  'Enviado':'bg-purple-400','Entregado':'bg-green-400','Cancelado':'bg-red-400'
+};
+
+/* Datos de muestra pedidos */
+const SAMPLE_ORDERS = [
+  {id:'AEC-001',cliente:'María García',   producto:'Arroz de la Huerta (2p)',     cantidad:1,precio:25.80,estado:'Entregado', fecha:'2024-06-01',local:'Colmenar Viejo',entrega:'domicilio'},
+  {id:'AEC-002',cliente:'Carlos Martínez',producto:'Arroz Internacional (4p)',    cantidad:1,precio:67.60,estado:'En proceso',fecha:'2024-06-02',local:'Tres Cantos',   entrega:'recogida'},
+  {id:'AEC-003',cliente:'Ana López',      producto:'Lumusín Smash Burger',        cantidad:2,precio:19.00,estado:'Enviado',   fecha:'2024-06-02',local:'Colmenar Viejo',entrega:'domicilio'},
+  {id:'AEC-004',cliente:'Pedro Sánchez',  producto:'Fideuá del Mediterráneo (2p)',cantidad:1,precio:22.50,estado:'Pendiente', fecha:'2024-06-03',local:'Ávila',          entrega:'domicilio'},
+  {id:'AEC-005',cliente:'Laura Fernández',producto:'Empanada Argentina (6u)',     cantidad:2,precio:28.00,estado:'Cancelado', fecha:'2024-06-03',local:'Colmenar Viejo',entrega:'recogida'},
+  {id:'AEC-006',cliente:'Jorge Ruiz',     producto:'Arroz Negro con Sepia (2p)', cantidad:1,precio:27.40,estado:'Pendiente', fecha:'2024-06-04',local:'Tres Cantos',   entrega:'domicilio'},
+];
+
+/* Datos de muestra productos (seed si aec_products no existe) */
+const SEED_PRODUCTS = [
+  {id:1, cat:'arroces',img:'setas',   name:'Arroz Pinícola (Setas y Boletus)',price:17.00,unit:'rac',minR:2,desc:'Sofrito natural, fondo de verduras, setas y boletus',al:['Sulfitos','Apio'],top:false,active:true},
+  {id:2, cat:'arroces',img:'tinta',   name:'Arroz de Tinta',                  price:15.50,unit:'rac',minR:2,desc:'Sofrito natural, calamar, gambas, tinta de calamar',al:['Crustáceos','Moluscos','Pescado'],top:false,active:true},
+  {id:3, cat:'arroces',img:'carne',   name:'Arroz Internacional',             price:16.90,unit:'rac',minR:2,desc:'Sofrito natural, pechuga de pato, judiones y foie',al:['Sulfitos'],top:false,active:true},
+  {id:4, cat:'arroces',img:'marisco', name:'Arroz Castita y Galán',           price:14.50,unit:'rac',minR:2,desc:'Sofrito natural, gambitas peladas y calamar',al:['Crustáceos','Moluscos'],top:false,active:true},
+  {id:5, cat:'arroces',img:'paella',  name:'Arroz Tricantino',                price:15.50,unit:'rac',minR:2,desc:'Sofrito natural, caldo de marisco, gambas, calamar',al:['Crustáceos','Moluscos','Gluten'],top:true,active:true},
+  {id:6, cat:'arroces',img:'verduras',name:'Arroz de la Huerta',              price:12.90,unit:'rac',minR:2,desc:'Sofrito natural, verduras variadas y garbanzos. Vegano',al:['Apio'],top:false,active:true},
+  {id:7, cat:'arroces',img:'setas',   name:'Risotto de Verduras y Hongos',    price:13.50,unit:'rac',minR:2,desc:'Sofrito natural, hongos de temporada y parmesano',al:['Lácteos','Gluten'],top:false,active:true},
+  {id:8, cat:'arroces',img:'carne',   name:'Arroz Dehesa Extremeña',          price:15.90,unit:'rac',minR:2,desc:'Sofrito natural, pluma, costilla y solomillo ibérico',al:['Soja','Sulfitos','Apio'],top:false,active:true},
+  {id:9, cat:'arroces',img:'pollo',   name:'Arroz de Granja y Caracoles',     price:15.50,unit:'rac',minR:2,desc:'Sofrito natural, pollo de corral y caracoles',al:['Gluten','Moluscos'],top:false,active:true},
+  {id:10,cat:'arroces',img:'pollo',   name:'Arroz Latino',                    price:14.90,unit:'rac',minR:2,desc:'Sofrito natural, pechuga, maíz dulce y aguacate',al:[],top:false,active:true},
+  {id:11,cat:'arroces',img:'bogavante',name:'Arroz de Bogavante',             price:19.00,unit:'rac',minR:2,desc:'Sofrito natural, bogavante canadiense y caldo de marisco',al:['Crustáceos','Moluscos','Sulfitos'],top:true,active:true},
+  {id:12,cat:'arroces',img:'pollo',   name:'Arroz de Pollo y Maíz',          price:13.90,unit:'rac',minR:2,desc:'Sofrito natural, pollo deshuesado, maíz y garbanzos',al:['Gluten'],top:false,active:true},
+  {id:13,cat:'arroces',img:'pescado', name:'Arroz con Bacalao Atlántico',     price:17.50,unit:'rac',minR:2,desc:'Sofrito natural, bacalao atlántico y espinacas',al:['Pescado','Gluten'],top:false,active:true},
+  {id:14,cat:'arroces',img:'pulpo',   name:'Arroz de Pulpo a Feira',          price:16.90,unit:'rac',minR:2,desc:'Sofrito natural, pulpo gallego y pimentón de la Vera',al:['Moluscos'],top:false,active:true},
+  {id:15,cat:'arroces',img:'marisco', name:'Arroz de Mariskito',              price:19.00,unit:'rac',minR:2,desc:'Sofrito natural, marisco variado y rosada',al:['Crustáceos','Moluscos','Pescado'],top:true,active:true},
+  {id:16,cat:'arroces',img:'carne',   name:'Arroz Tierra de Toros',           price:16.50,unit:'rac',minR:2,desc:'Sofrito natural, rabo de toro deshuesado',al:['Gluten','Sulfitos','Apio'],top:false,active:true},
+  {id:17,cat:'arroces',img:'carne',   name:'Arroz de Manitas Raza Duroc',     price:17.00,unit:'rac',minR:2,desc:'Sofrito natural, manitas de cerdo Duroc',al:['Sulfitos'],top:false,active:true},
+  {id:18,cat:'arroces',img:'paella',  name:'Arroz Secreto',                   price:16.50,unit:'rac',minR:2,desc:'Nuestra receta estrella',al:['Gluten','Crustáceos'],top:false,active:true},
+  {id:19,cat:'arroces',img:'pollo',   name:'Arroz Pollo Halal',               price:13.90,unit:'rac',minR:2,desc:'Sofrito natural, caldo de ave y pollo halal deshuesado',al:['Gluten'],top:false,active:true},
+  {id:20,cat:'fideuas',img:'carne',   name:'Fideuá de Rabo de Toro',          price:15.00,unit:'rac',minR:2,desc:'Sofrito natural, rabo de toro y fideos tostados',al:['Gluten','Sulfitos','Apio'],top:false,active:true},
+  {id:21,cat:'fideuas',img:'tinta',   name:'Fideuá de Tinta',                 price:15.50,unit:'rac',minR:2,desc:'Sofrito natural, calamar, gambas y tinta de calamar',al:['Crustáceos','Moluscos','Gluten'],top:false,active:true},
+  {id:22,cat:'fideuas',img:'verduras',name:'Fideuá de Verduras',              price:15.00,unit:'rac',minR:2,desc:'Sofrito natural, verduras y fideo tostado',al:['Gluten','Apio'],top:false,active:true},
+  {id:23,cat:'fideuas',img:'pollo',   name:'Fideuá de Pollo y Maíz',         price:14.00,unit:'rac',minR:2,desc:'Sofrito natural, pollo y fideo tostado',al:['Gluten'],top:false,active:true},
+  {id:24,cat:'fideuas',img:'carne',   name:'Fideuá Dehesa Extremeña',         price:14.50,unit:'rac',minR:2,desc:'Sofrito natural, ibérico y fideo tostado',al:['Gluten','Sulfitos','Apio'],top:false,active:true},
+  {id:25,cat:'fideuas',img:'marisco', name:'Fideuá Marinera',                 price:14.50,unit:'rac',minR:2,desc:'Sofrito natural, gambas, sepia y fideos finos',al:['Crustáceos','Moluscos','Pescado','Gluten'],top:true,active:true},
+  {id:54,cat:'smashburger',name:'Smash Burger Clásica',price:9.90,unit:'ud',desc:'Doble smash de ternera, queso americano y salsa especial',al:['Gluten','Huevos','Lácteos','Mostaza'],top:true,active:true},
+  {id:55,cat:'smashburger',name:'Smash Burger Bacon',  price:11.50,unit:'ud',desc:'Doble smash, bacon crujiente y cheddar fundido',al:['Gluten','Lácteos','Mostaza'],top:false,active:true},
+  {id:56,cat:'smashburger',name:'Smash Burger Vegana', price:10.50,unit:'ud',desc:'Base de garbanzos, aguacate, tomate y alioli vegano',al:['Gluten','Mostaza'],top:false,active:true},
+  {id:57,cat:'smashburger',name:'Smash Burger Doble',  price:13.90,unit:'ud',desc:'Triple smash, doble cheddar, bacon y salsa BBQ',al:['Gluten','Huevos','Lácteos','Mostaza'],top:false,active:true},
+  {id:58,cat:'smashburger',name:'Patatas Smash',        price:4.50,unit:'ud',desc:'Patatas fritas crujientes con salsa especial',al:['Huevos','Mostaza'],top:false,active:true},
+  {id:59,cat:'lepain',name:'Bocadillo de Calamares',price:7.90,unit:'ud',desc:'Pan artesano, calamares frescos y alioli casero',al:['Gluten','Huevos','Moluscos'],top:false,active:true},
+  {id:60,cat:'lepain',name:'Pan de Ajo',             price:3.90,unit:'ud',desc:'Pan artesano con mantequilla de ajo y perejil',al:['Gluten','Lácteos'],top:false,active:true},
+  {id:61,cat:'lepain',name:'Tosta de Jamón Ibérico', price:8.50,unit:'ud',desc:'Pan de cristal, jamón ibérico y tomate natural',al:['Gluten','Sulfitos'],top:false,active:true},
+  {id:62,cat:'lepain',name:'Bocadillo Vegetal',      price:6.90,unit:'ud',desc:'Pan integral, hummus, rúcula y aguacate',al:['Gluten','Sésamo'],top:false,active:true},
+  {id:63,cat:'kajita',name:'K@jita de Pollo',    price:9.90,unit:'ud',desc:'Muslos de pollo en adobo, arroz blanco y ensalada',al:['Gluten','Sulfitos'],top:false,active:true},
+  {id:64,cat:'kajita',name:'K@jita de Costillas',price:11.90,unit:'ud',desc:'Costillas glaseadas con miel y mostaza, con patatas',al:['Gluten','Mostaza','Sulfitos'],top:false,active:true},
+  {id:65,cat:'kajita',name:'K@jita Vegana',      price:8.90,unit:'ud',desc:'Tofu marinado, quinoa, verduras asadas y tahini',al:['Sésamo'],top:false,active:true},
+  {id:66,cat:'empanadas',name:'Empanada de Carne',              price:3.50,unit:'ud',desc:'Masa casera rellena de carne picada y especias',al:['Gluten','Huevos'],top:true,active:true},
+  {id:67,cat:'empanadas',name:'Empanada de Pollo',              price:3.50,unit:'ud',desc:'Masa casera rellena de pechuga de pollo y verduras',al:['Gluten','Huevos'],top:false,active:true},
+  {id:68,cat:'empanadas',name:'Empanada Espinacas y Queso',     price:3.50,unit:'ud',desc:'Masa casera rellena de espinacas y queso fundido',al:['Gluten','Huevos','Lácteos'],top:false,active:true},
+  {id:69,cat:'empanadas',name:'Pack 6 Empanadas Mixtas',        price:19.00,unit:'ud',desc:'6 empanadas a elegir entre carne, pollo y espinacas',al:['Gluten','Huevos','Lácteos'],top:false,active:true},
+  {id:28,cat:'asados',name:'Lechazo Asado',     price:22.90,unit:'rac',minR:2,desc:'Lechazo asado al horno de leña con patatas panaderas',al:['Gluten','Sulfitos'],top:false,active:true},
+  {id:29,cat:'asados',name:'Cochinillo Asado',  price:21.90,unit:'rac',minR:2,desc:'Cochinillo segoviano asado a baja temperatura',al:[],top:false,active:true},
+  {id:30,cat:'asados',name:'Pollo Asado',       price:14.90,unit:'ud',desc:'Pollo de corral entero asado con ajo y limón',al:[],top:false,active:true},
+  {id:31,cat:'asados',name:'Costillar de Cerdo',price:18.90,unit:'ud',desc:'Costillar a la brasa con salsa BBQ y ensalada',al:['Gluten','Mostaza','Sulfitos'],top:false,active:true},
+  {id:32,cat:'postres',name:'Tarta de Queso',        price:5.90,unit:'ud',desc:'Tarta de queso al horno estilo La Viña',al:['Gluten','Huevos','Lácteos'],top:false,active:true},
+  {id:33,cat:'postres',name:'Brownie con Helado',    price:6.50,unit:'ud',desc:'Brownie de chocolate negro con helado de vainilla',al:['Gluten','Huevos','Lácteos','Frutos secos'],top:false,active:true},
+  {id:34,cat:'postres',name:'Flan Casero',           price:4.90,unit:'ud',desc:'Flan de huevo casero con caramelo artesano',al:['Huevos','Lácteos'],top:false,active:true},
+  {id:35,cat:'postres',name:'Natillas de la Abuela', price:4.50,unit:'ud',desc:'Natillas cremosas con canela y galleta María',al:['Gluten','Huevos','Lácteos'],top:false,active:true},
+  {id:36,cat:'bebidas',name:'Agua 500ml',        price:1.50,unit:'ud',desc:'Agua mineral natural',al:[],top:false,active:true},
+  {id:37,cat:'bebidas',name:'Refresco lata',     price:2.50,unit:'ud',desc:'Coca-Cola, Fanta, Nestea o Schweppes',al:[],top:false,active:true},
+  {id:38,cat:'bebidas',name:'Cerveza Mahou 33cl',price:2.90,unit:'ud',desc:'Cerveza Mahou 5 Estrellas bien fría',al:['Gluten'],top:false,active:true},
+  {id:39,cat:'bebidas',name:'Limonada Casera',   price:3.50,unit:'ud',desc:'Limonada natural con hierbabuena y menta',al:[],top:false,active:true},
+  {id:40,cat:'vinos',name:'Vino Tinto D.O. Ribera',price:12.90,unit:'bot',desc:'Ribera del Duero joven, frutoso y equilibrado',al:['Sulfitos'],top:false,active:true},
+  {id:41,cat:'vinos',name:'Vino Blanco D.O. Rueda',price:12.90,unit:'bot',desc:'Verdejo fresco y aromático',al:['Sulfitos'],top:false,active:true},
+  {id:42,cat:'vinos',name:'Copa de Vino Tinto',    price:3.50,unit:'ud',desc:'Copa de vino tinto de la casa',al:['Sulfitos'],top:false,active:true},
+  {id:43,cat:'vinos',name:'Vermú Rojo con Sifón',  price:4.90,unit:'ud',desc:'Vermú rojo artesano con aceitunas y naranja',al:['Sulfitos'],top:false,active:true},
+  {id:44,cat:'vinos',name:'Cava Brut Nature',       price:16.90,unit:'bot',desc:'Cava catalán brut nature',al:['Sulfitos'],top:false,active:true},
+  {id:45,cat:'gourmet',name:'Croquetas de Jamón Ibérico (8 ud)',price:9.90,unit:'ud',desc:'Bechamel casera con jamón ibérico de bellota',al:['Gluten','Huevos','Lácteos'],top:false,active:true},
+  {id:46,cat:'gourmet',name:'Tataki de Atún',        price:13.90,unit:'ud',desc:'Atún rojo a la plancha con vinagreta de soja',al:['Pescado','Sésamo','Gluten'],top:false,active:true},
+  {id:47,cat:'gourmet',name:'Carpaccio de Gambas',   price:12.50,unit:'ud',desc:'Gambas rojas marinadas con aceite y limón',al:['Crustáceos'],top:false,active:true},
+  {id:48,cat:'gourmet',name:'Tartar de Ternera',     price:14.90,unit:'ud',desc:'Ternera a cuchillo, alcaparras y mostaza antigua',al:['Huevos','Mostaza'],top:false,active:true},
+  {id:49,cat:'extras',name:'Ensalada de la Casa',    price:6.90,unit:'ud',desc:'Mezclum, tomate cherry, pepino y vinagreta',al:['Mostaza'],top:false,active:true},
+  {id:50,cat:'extras',name:'Patatas Bravas',          price:5.50,unit:'ud',desc:'Patatas fritas con salsa brava y alioli',al:['Huevos','Mostaza'],top:false,active:true},
+  {id:51,cat:'extras',name:'Gazpacho Casero (500ml)', price:5.90,unit:'ud',desc:'Gazpacho andaluz con tomates maduros',al:['Gluten'],top:false,active:true},
+  {id:52,cat:'extras',name:'Alioli Casero',           price:2.00,unit:'ud',desc:'Alioli de elaboración propia',al:['Huevos'],top:false,active:true},
+  {id:53,cat:'extras',name:'Pan de Mesa',             price:2.50,unit:'ud',desc:'Pan artesano de hogaza con AOVE',al:['Gluten'],top:false,active:true},
+];
+
+/* ════════════════════════════════════════════════
+   HELPERS localStorage
+   ════════════════════════════════════════════════ */
+/* Garantiza que cada pedido tiene un id único y campos normalizados */
+function normalizeOrder(o, idx) {
+  return {
+    ...o,
+    id:      o.id   || o.num || `ORD-${idx}-${Date.now()}`,
+    estado:  o.estado || o.status   || 'Pendiente',
+    cliente: o.cliente || o.name    || '—',
+    fecha:   o.fecha   || (o.ts ? o.ts.slice(0,10) : ''),
+    local:   o.local   || o.loc     || '',
+    entrega: o.entrega || o.delivery|| '',
+    precio:  o.precio  !== undefined ? o.precio : (o.total || 0),
+    cantidad: o.cantidad || 1,
+  };
+}
+function loadOrders() {
+  try {
+    const raw = localStorage.getItem(ORDERS_KEY);
+    const list = raw ? JSON.parse(raw) : SAMPLE_ORDERS;
+    return list.map(normalizeOrder);
+  } catch { return SAMPLE_ORDERS.map(normalizeOrder); }
+}
+function saveOrders(list) { localStorage.setItem(ORDERS_KEY, JSON.stringify(list)); }
+
+function loadProducts() {
+  try {
+    const raw = localStorage.getItem(PRODUCTS_KEY);
+    return raw ? JSON.parse(raw) : SEED_PRODUCTS;
+  } catch { return SEED_PRODUCTS; }
+}
+function saveProducts(list) { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(list)); }
+
+function fmt(n) {
+  return new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR'}).format(n);
+}
+function exportCSV(orders) {
+  const h = ['ID','Cliente','Teléfono','Email','Productos','Total €','Estado','Fecha','Local','Entrega'];
+  const rows = orders.map(o=>{
+    const id       = o.id||o.num||'';
+    const cliente  = o.cliente||o.name||'';
+    const tel      = o.telefono||'';
+    const mail     = o.email||'';
+    const producto = Array.isArray(o.items)&&o.items.length
+      ? o.items.map(it=>`${it.name} (${it.sub_label})`).join(' | ')
+      : (o.producto||'');
+    const total    = (Number(o.precio||o.total||0)*Number(o.cantidad||1)).toFixed(2);
+    const estado   = o.estado||o.status||'';
+    const fecha    = o.fecha||(o.ts?o.ts.slice(0,10):'');
+    const local    = o.local||o.loc||'';
+    const entrega  = o.entrega||o.delivery||'';
+    return [id,cliente,tel,mail,producto,total,estado,fecha,local,entrega].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+  });
+  const csv = [h.join(','),...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download = `pedidos_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+const ORDER_COUNTER_KEY = 'aec_order_counter';
+function generateOrderId() {
+  const year = new Date().getFullYear();
+  const stored = JSON.parse(localStorage.getItem(ORDER_COUNTER_KEY) || '{"year":0,"count":0}');
+  const count = stored.year === year ? stored.count + 1 : 1;
+  localStorage.setItem(ORDER_COUNTER_KEY, JSON.stringify({year, count}));
+  return `${year}/${String(count).padStart(5,'0')}`;
+}
+
+/* ════════════════════════════════════════════════
+   COMPONENTES COMPARTIDOS
+   ════════════════════════════════════════════════ */
+function Badge({estado}) {
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${ESTADO_STYLE[estado]||'bg-white/10 text-white/50 border-white/10'}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${ESTADO_DOT[estado]||'bg-white/40'}`}></span>
+      {estado}
+    </span>
+  );
+}
+
+function Toggle({checked, onChange}) {
+  return (
+    <button
+      onClick={()=>onChange(!checked)}
+      className={`relative w-10 h-5 rounded-full transition-colors ${checked?'bg-brand':'bg-white/15'}`}
+    >
+      <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${checked?'left-5':'left-0.5'}`}/>
+    </button>
+  );
+}
+
+function Toast({toast}) {
+  if (!toast) return null;
+  const colors = {ok:'bg-green-500/20 border-green-400/30 text-green-300', err:'bg-red-500/20 border-red-400/30 text-red-300', info:'bg-blue-500/20 border-blue-400/30 text-blue-300'};
+  return (
+    <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium border ${colors[toast.type]||colors.ok}`}>
+      <span>{toast.type==='ok'?'✓':toast.type==='err'?'✕':'ℹ'}</span>{toast.msg}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   PANTALLA DE LOGIN
+   ════════════════════════════════════════════════ */
+function LoginScreen({onAuth}) {
+  const [pwd, setPwd] = useState('');
+  const [err, setErr] = useState(false);
+
+  const submit = () => {
+    if (pwd === ADMIN_PWD) {
+      localStorage.setItem(AUTH_KEY,'1');
+      onAuth();
+    } else {
+      setErr(true);
+      setPwd('');
+      setTimeout(()=>setErr(false),2000);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-dark flex items-center justify-center p-4">
+      <div className="bg-dark-3 border border-white/10 rounded-2xl p-8 w-full max-w-sm text-center shadow-2xl">
+        <div className="text-2xl font-bold mb-1">
+          arroz<span className="text-brand">·en·</span>caja
+        </div>
+        <div className="text-white/40 text-sm mb-8">Panel de administración</div>
+        <div className="text-left mb-2 text-xs text-white/40 uppercase tracking-wider">Contraseña</div>
+        <input
+          type="password"
+          value={pwd}
+          onChange={e=>{setPwd(e.target.value);setErr(false);}}
+          onKeyDown={e=>e.key==='Enter'&&submit()}
+          placeholder="••••••••"
+          className={`w-full bg-dark-2 border rounded-xl px-4 py-3 text-white text-center text-lg tracking-widest focus:outline-none mb-3 transition-colors
+            ${err?'border-red-400/60':'border-white/15 focus:border-brand/60'}`}
+          autoFocus
+        />
+        {err && <p className="text-red-400 text-xs mb-3">Contraseña incorrecta</p>}
+        <button
+          onClick={submit}
+          className="w-full bg-brand hover:bg-brand-light text-dark font-bold py-3 rounded-xl transition-colors"
+        >Entrar</button>
+        <button
+          onClick={()=>window.location.href='arrozencaja_v4.html'}
+          className="mt-3 w-full text-white/30 hover:text-white/50 text-sm py-2 transition-colors"
+        >← Volver a la web</button>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   MODAL PEDIDO MANUAL
+   ════════════════════════════════════════════════ */
+function OrderModal({onSave, onClose}) {
+  const [products] = useState(()=>loadProducts().filter(p=>p.active!==false));
+  const today = new Date().toISOString().slice(0,10);
+  const [form, setForm] = useState({
+    id: '',
+    cliente:'', telefono:'', email:'',
+    local:'', entrega:'recogida',
+    estado:'Pendiente', fecha:today,
+    items:[], notas:'',
+  });
+  const [selProd, setSelProd] = useState('');
+  const [selQty,  setSelQty]  = useState(1);
+  const [selTag,  setSelTag]  = useState('');
+
+  const set = (k,v) => setForm(f=>({...f,[k]:v}));
+  const total = form.items.reduce((s,it)=>s+Number(it.price||0), 0);
+
+  const addItem = () => {
+    const prod = products.find(p=>String(p.id)===String(selProd));
+    if (!prod) return;
+    const label = selTag.trim() || `${selQty} ${prod.unit||'ud'}`;
+    setForm(f=>({...f, items:[...f.items, {
+      name: prod.name,
+      sub_label: label,
+      price: Number((prod.price * selQty).toFixed(2)),
+    }]}));
+    setSelProd(''); setSelQty(1); setSelTag('');
+  };
+  const removeItem = idx => setForm(f=>({...f, items:f.items.filter((_,i)=>i!==idx)}));
+
+  const submit = () => {
+    if (!form.cliente.trim()) return;
+    const id = generateOrderId();
+    const producto = form.items.length ? form.items.map(it=>it.name).join(', ') : '—';
+    onSave({...form, id, producto, precio:Number(total.toFixed(2)), cantidad:1});
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark/80 backdrop-blur-sm" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="bg-dark-3 border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl">
+
+        {/* Header */}
+        <div className="flex items-start justify-between px-6 py-4 border-b border-white/10">
+          <div>
+            <h2 className="font-bold text-white">Nuevo pedido manual</h2>
+            <div className="text-xs text-brand/70 font-mono mt-0.5">{form.id ? `ID asignado: ${form.id}` : 'ID se asignará al guardar'}</div>
+          </div>
+          <button onClick={onClose} className="text-white/40 hover:text-white/80 text-xl leading-none mt-0.5">✕</button>
+        </div>
+
+        <div className="px-6 py-5 space-y-4">
+
+          {/* Datos del cliente */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Cliente *</label>
+              <input value={form.cliente} onChange={e=>set('cliente',e.target.value)} placeholder="Nombre completo"
+                className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60"/>
+            </div>
+            <div>
+              <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Teléfono</label>
+              <input value={form.telefono} onChange={e=>set('telefono',e.target.value)} placeholder="6XX XXX XXX"
+                className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60"/>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Email</label>
+            <input type="email" value={form.email} onChange={e=>set('email',e.target.value)} placeholder="cliente@email.com"
+              className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60"/>
+          </div>
+
+          {/* Local / Entrega / Fecha */}
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Local / Ciudad</label>
+              <input value={form.local} onChange={e=>set('local',e.target.value)} placeholder="Colmenar Viejo…"
+                className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60"/>
+            </div>
+            <div>
+              <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Entrega</label>
+              <select value={form.entrega} onChange={e=>set('entrega',e.target.value)}
+                className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60">
+                <option value="recogida">Recogida</option>
+                <option value="domicilio">Domicilio</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Fecha</label>
+              <input type="date" value={form.fecha} onChange={e=>set('fecha',e.target.value)}
+                className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60"/>
+            </div>
+          </div>
+
+          {/* Estado inicial */}
+          <div>
+            <label className="block text-xs text-white/40 uppercase tracking-wider mb-2">Estado inicial</label>
+            <div className="flex gap-2 flex-wrap">
+              {ESTADOS_ORDER.map(e=>(
+                <button key={e} onClick={()=>set('estado',e)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all border ${form.estado===e?'bg-brand text-dark border-brand':'bg-dark-2 text-white/50 border-white/10 hover:border-white/20'}`}>
+                  {e}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Productos */}
+          <div>
+            <label className="block text-xs text-white/40 uppercase tracking-wider mb-2">Productos del pedido</label>
+
+            {/* Lista de items añadidos */}
+            {form.items.length > 0 && (
+              <div className="space-y-1.5 mb-3 p-3 bg-dark-2 border border-white/8 rounded-xl">
+                {form.items.map((it,i)=>(
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-white">{it.name}</span>
+                      <span className="text-xs text-white/40 ml-1.5">{it.sub_label}</span>
+                    </div>
+                    <span className="text-sm font-semibold text-brand whitespace-nowrap">{fmt(it.price)}</span>
+                    <button onClick={()=>removeItem(i)} className="text-red-400/50 hover:text-red-400 text-base leading-none ml-1">✕</button>
+                  </div>
+                ))}
+                <div className="border-t border-white/8 pt-2 flex justify-end">
+                  <span className="text-sm font-bold text-white">Total: <span className="text-brand">{fmt(total)}</span></span>
+                </div>
+              </div>
+            )}
+
+            {/* Selector de producto */}
+            <div className="flex gap-2 items-start">
+              <div className="flex-1 min-w-0">
+                <select value={selProd} onChange={e=>setSelProd(e.target.value)}
+                  className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand/60">
+                  <option value="">Seleccionar producto…</option>
+                  {Object.entries(CAT_LABELS).map(([cat, lbl])=>{
+                    const prods = products.filter(p=>p.cat===cat);
+                    if (!prods.length) return null;
+                    return <optgroup key={cat} label={lbl}>
+                      {prods.map(p=><option key={p.id} value={p.id}>{p.name} · {fmt(p.price)}/{p.unit||'ud'}</option>)}
+                    </optgroup>;
+                  })}
+                </select>
+              </div>
+              <input type="number" min="1" max="99" value={selQty}
+                onChange={e=>setSelQty(Math.max(1,Number(e.target.value)||1))}
+                title="Cantidad"
+                className="w-14 bg-dark-2 border border-white/15 rounded-xl px-2 py-2 text-white text-sm text-center focus:outline-none focus:border-brand/60"/>
+              <input value={selTag} onChange={e=>setSelTag(e.target.value)} placeholder="Etiqueta"
+                title="Etiqueta opcional (ej: 2p, 4 personas…)"
+                className="w-28 bg-dark-2 border border-white/15 rounded-xl px-2 py-2 text-white text-sm focus:outline-none focus:border-brand/60"/>
+              <button onClick={addItem} disabled={!selProd}
+                className="bg-brand/20 hover:bg-brand/30 disabled:opacity-40 text-brand border border-brand/30 text-sm px-3 py-2 rounded-xl transition-colors whitespace-nowrap font-semibold">
+                + Añadir
+              </button>
+            </div>
+            <p className="text-xs text-white/25 mt-1.5">Etiqueta opcional: "2 personas", "4p", "pack familiar"…</p>
+          </div>
+
+          {/* Notas internas */}
+          <div>
+            <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Notas internas</label>
+            <textarea value={form.notas} onChange={e=>set('notas',e.target.value)} rows={2}
+              placeholder="Instrucciones especiales, anotaciones del pedido…"
+              className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60 resize-none"/>
+          </div>
+        </div>
+
+        <div className="px-6 py-4 border-t border-white/10 flex gap-3 justify-end">
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm text-white/50 hover:text-white/80 border border-white/10 hover:border-white/20 transition-colors">Cancelar</button>
+          <button onClick={submit} disabled={!form.cliente.trim()}
+            className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-light disabled:opacity-40 text-dark font-semibold text-sm transition-colors">
+            Crear pedido
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   TAB: PEDIDOS
+   ════════════════════════════════════════════════ */
+function TabPedidos({showToast}) {
+  const [orders,      setOrders]      = useState(loadOrders);
+  const [search,      setSearch]      = useState('');
+  const [filter,      setFilter]      = useState('Todos');
+  const [sort,        setSort]        = useState({col:'fecha',dir:'desc'});
+  const [selIds,      setSelIds]      = useState(new Set());
+  const [bulkSt,      setBulkSt]      = useState('');
+  const [refreshing,  setRefreshing]  = useState(false);
+  const [confirmDel,  setConfirmDel]  = useState(false); // modal verificación borrado
+  const [confirmReset,setConfirmReset]= useState(false); // modal reinicio contador
+  const [orderModal,  setOrderModal]  = useState(false); // modal pedido manual
+
+  useEffect(()=>{ saveOrders(orders); },[orders]);
+
+  const refresh = () => {
+    setRefreshing(true);
+    setTimeout(()=>{
+      setOrders(loadOrders());
+      setRefreshing(false);
+      showToast('Pedidos actualizados','info');
+    }, 400);
+  };
+
+  const filtered = useMemo(()=>{
+    let l = filter==='Todos' ? orders : orders.filter(o=>o.estado===filter);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      l = l.filter(o=>[o.id,o.cliente,o.producto,o.local||''].some(v=>String(v).toLowerCase().includes(q)));
+    }
+    return [...l].sort((a,b)=>{
+      let va=a[sort.col], vb=b[sort.col];
+      if(['precio','cantidad'].includes(sort.col)){va=+va;vb=+vb;}
+      return sort.dir==='asc'?(va<vb?-1:va>vb?1:0):(va<vb?1:va>vb?-1:0);
+    });
+  },[orders,filter,search,sort]);
+
+  const stats = useMemo(()=>({
+    total: orders.length,
+    pendiente: orders.filter(o=>o.estado==='Pendiente').length,
+    enproceso: orders.filter(o=>o.estado==='En proceso').length,
+    revenue:   orders.filter(o=>o.estado!=='Cancelado').reduce((s,o)=>s+Number(o.precio||o.total||0)*Number(o.cantidad||1),0),
+  }),[orders]);
+
+  const tSort = col => setSort(s=>s.col===col?{col,dir:s.dir==='asc'?'desc':'asc'}:{col,dir:'asc'});
+
+  const updateStatus = (id, estado) => {
+    setOrders(p=>p.map(o=>o.id===id?{...o,estado}:o));
+    showToast(`${id} → ${estado}`,'ok');
+  };
+  const toggleSel = id => setSelIds(p=>{const n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});
+  const toggleAll = () => selIds.size===filtered.length?setSelIds(new Set()):setSelIds(new Set(filtered.map(o=>o.id)));
+  const applyBulk = () => {
+    if(!bulkSt||!selIds.size) return;
+    setOrders(p=>p.map(o=>selIds.has(o.id)?{...o,estado:bulkSt}:o));
+    showToast(`${selIds.size} pedidos → ${bulkSt}`,'ok');
+    setSelIds(new Set()); setBulkSt('');
+  };
+  const deleteSelected = () => {
+    const n = selIds.size;
+    setOrders(p=>p.filter(o=>!selIds.has(o.id)));
+    setSelIds(new Set());
+    setConfirmDel(false);
+    showToast(`${n} pedido${n!==1?'s':''} eliminado${n!==1?'s':''}`, 'info');
+  };
+
+  const resetCounter = () => {
+    localStorage.setItem(ORDER_COUNTER_KEY, JSON.stringify({year:0, count:0}));
+    setConfirmReset(false);
+    showToast('Contador de IDs reiniciado — el próximo pedido será 2026/00001', 'ok');
+  };
+
+  const handleCreateOrder = (order) => {
+    setOrders(p=>[order, ...p]);
+    showToast(`Pedido ${order.id} creado`, 'ok');
+    setOrderModal(false);
+  };
+
+  const TH = ({col,label,cls=''}) => (
+    <th onClick={()=>tSort(col)} className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/40 cursor-pointer select-none hover:text-white/70 ${cls}`}>
+      <span className="inline-flex items-center gap-1">{label}
+        {sort.col===col?<span className="text-brand">{sort.dir==='asc'?'↑':'↓'}</span>:<span className="opacity-20">↕</span>}
+      </span>
+    </th>
+  );
+
+  return (
+    <div className="space-y-5">
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[['Total pedidos',stats.total,'text-white'],['Pendientes',stats.pendiente,'text-yellow-300'],['En proceso',stats.enproceso,'text-blue-300'],['Facturación',fmt(stats.revenue),'text-brand']].map(([l,v,c])=>(
+          <div key={l} className="bg-dark-3 border border-white/5 rounded-xl p-4">
+            <div className="text-xs text-white/40 uppercase tracking-wider mb-1">{l}</div>
+            <div className={`text-2xl font-bold ${c}`}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filtros */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path strokeLinecap="round" d="m21 21-4.35-4.35"/></svg>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar por ID, cliente, producto…"
+            className="w-full bg-dark-3 border border-white/10 rounded-xl pl-9 pr-8 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-brand/50"/>
+          {search && <button onClick={()=>setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60">✕</button>}
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {['Todos',...ESTADOS_ORDER].map(e=>(
+            <button key={e} onClick={()=>setFilter(e)}
+              className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${filter===e?'bg-brand text-dark border-brand':'bg-dark-3 text-white/50 border-white/10 hover:border-white/20 hover:text-white/70'}`}>{e}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* Bulk */}
+      {selIds.size>0 && (
+        <div className="flex items-center gap-3 bg-brand/10 border border-brand/30 rounded-xl px-4 py-3 flex-wrap">
+          <span className="text-sm text-brand font-medium">{selIds.size} seleccionado{selIds.size!==1?'s':''}</span>
+          <div className="flex gap-2 ml-auto flex-wrap items-center">
+            <select value={bulkSt} onChange={e=>setBulkSt(e.target.value)} className="bg-dark-3 border border-white/15 text-white text-xs rounded-lg px-2 py-1.5 focus:outline-none">
+              <option value="">Cambiar estado…</option>
+              {ESTADOS_ORDER.map(s=><option key={s}>{s}</option>)}
+            </select>
+            <button onClick={applyBulk} disabled={!bulkSt} className="bg-brand disabled:opacity-40 hover:bg-brand-light text-dark text-xs font-semibold px-3 py-1.5 rounded-lg">Aplicar</button>
+            {/* Separador */}
+            <span className="text-white/15 text-sm select-none">|</span>
+            {/* Botón eliminar */}
+            <button onClick={()=>setConfirmDel(true)}
+              className="flex items-center gap-1.5 text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-400/60 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Eliminar
+            </button>
+            <button onClick={()=>setSelIds(new Set())} className="text-white/40 hover:text-white/60 text-xs px-2">Cancelar</button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal confirmación borrado */}
+      {confirmDel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark/80 backdrop-blur-sm">
+          <div className="bg-dark-3 border border-red-400/20 rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <div className="w-12 h-12 rounded-full bg-red-400/15 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </div>
+            <h3 className="font-bold text-white text-lg mb-2">¿Eliminar pedidos?</h3>
+            <p className="text-sm text-white/50 mb-1">
+              Vas a eliminar <span className="text-red-300 font-semibold">{selIds.size} pedido{selIds.size!==1?'s':''}</span>.
+            </p>
+            <p className="text-xs text-white/30 mb-6">Esta acción es permanente y no se puede deshacer.</p>
+            <div className="flex gap-3">
+              <button onClick={()=>setConfirmDel(false)}
+                className="flex-1 py-2.5 rounded-xl border border-white/15 text-white/60 hover:text-white/80 text-sm transition-colors">
+                Cancelar
+              </button>
+              <button onClick={deleteSelected}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-400 text-white font-semibold text-sm transition-colors">
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmReset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark/80 backdrop-blur-sm">
+          <div className="bg-dark-3 border border-yellow-400/20 rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <div className="w-12 h-12 rounded-full bg-yellow-400/15 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </div>
+            <h3 className="font-bold text-white text-lg mb-2">¿Reiniciar contador de IDs?</h3>
+            <p className="text-sm text-white/50 mb-1">El próximo pedido que crees tendrá el ID <span className="text-yellow-300 font-semibold font-mono">{new Date().getFullYear()}/00001</span>.</p>
+            <p className="text-xs text-white/30 mb-6">Los pedidos existentes no se modifican. Esta acción no se puede deshacer.</p>
+            <div className="flex gap-3">
+              <button onClick={()=>setConfirmReset(false)}
+                className="flex-1 py-2.5 rounded-xl border border-white/15 text-white/60 hover:text-white/80 text-sm transition-colors">
+                Cancelar
+              </button>
+              <button onClick={resetCounter}
+                className="flex-1 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-dark font-semibold text-sm transition-colors">
+                Sí, reiniciar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tabla */}
+      <div className="bg-dark-2 border border-white/5 rounded-2xl overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+          <span className="text-xs text-white/40">{filtered.length} pedido{filtered.length!==1?'s':''}</span>
+          <div className="flex items-center gap-2">
+            <button onClick={refresh} title="Recargar pedidos"
+              className={`flex items-center gap-1.5 border border-white/15 hover:border-white/30 text-white/60 hover:text-white text-xs px-3 py-1.5 rounded-lg transition-all ${refreshing?'opacity-50 pointer-events-none':''}`}>
+              <svg className={`w-3.5 h-3.5 ${refreshing?'animate-spin':''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              {refreshing?'Actualizando…':'Actualizar'}
+            </button>
+            <button onClick={()=>setOrderModal(true)}
+              className="flex items-center gap-1 border border-brand/40 hover:border-brand/70 text-brand text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">
+              <span className="text-base leading-none">+</span> Nuevo pedido
+            </button>
+            <button onClick={()=>setConfirmReset(true)} title="Reiniciar contador de IDs"
+              className="flex items-center gap-1.5 border border-white/10 hover:border-white/25 text-white/40 hover:text-white/70 text-xs px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Reiniciar IDs
+            </button>
+            <button onClick={()=>exportCSV(filtered)} className="flex items-center gap-1.5 bg-brand hover:bg-brand-light text-dark font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              Exportar CSV
+            </button>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[650px]">
+            <thead className="bg-dark-3 border-b border-white/5">
+              <tr>
+                <th className="px-4 py-3 w-10"><input type="checkbox" checked={selIds.size===filtered.length&&filtered.length>0} onChange={toggleAll} className="w-4 h-4 accent-brand rounded cursor-pointer"/></th>
+                <TH col="id" label="ID"/>
+                <TH col="cliente" label="Cliente"/>
+                <TH col="producto" label="Producto" cls="hidden md:table-cell"/>
+                <TH col="precio" label="Precio"/>
+                <TH col="estado" label="Estado"/>
+                <TH col="fecha" label="Fecha" cls="hidden lg:table-cell"/>
+                <th className="px-4 py-3 text-xs font-semibold text-white/40 text-right">Cambiar</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {filtered.length===0
+                ? <tr><td colSpan="8" className="px-4 py-16 text-center text-white/30 text-sm">No se encontraron pedidos</td></tr>
+                : filtered.map(o=>(
+                  <tr key={o.id} className={`transition-colors hover:bg-white/[0.02] ${selIds.has(o.id)?'bg-brand/5':''}`}>
+                    <td className="px-4 py-3"><input type="checkbox" checked={selIds.has(o.id)} onChange={()=>toggleSel(o.id)} className="w-4 h-4 accent-brand rounded cursor-pointer"/></td>
+                    <td className="px-4 py-3"><span className="text-xs font-mono text-brand/80">{o.id}</span></td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-sm text-white">{o.cliente || o.name || '—'}</div>
+                      <div className="text-xs text-white/35">
+                        {o.local||o.loc||''}{(o.entrega||o.delivery)?' · '+(o.entrega||o.delivery):''}
+                      </div>
+                      {(o.telefono||o.email) && (
+                        <div className="text-xs text-white/25 mt-0.5">
+                          {o.telefono}{o.telefono&&o.email?' · ':''}{o.email}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      {/* Si hay items detallados los mostramos línea a línea, si no el string resumen */}
+                      {Array.isArray(o.items) && o.items.length > 0
+                        ? <div className="space-y-0.5">
+                            {o.items.map((it,i)=>(
+                              <div key={i} className="text-xs text-white/70">{it.name} <span className="text-white/35">({it.sub_label})</span></div>
+                            ))}
+                          </div>
+                        : <span className="text-sm text-white/70">{o.producto||o.items||'—'}</span>
+                      }
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-sm font-semibold text-white">
+                        {/* total = precio*cantidad (pedidos nuevos: cantidad=1, precio=total) */}
+                        {fmt(Number(o.precio||o.total||0) * Number(o.cantidad||1))}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3"><Badge estado={o.estado}/></td>
+                    <td className="px-4 py-3 hidden lg:table-cell"><span className="text-xs text-white/40">{o.fecha}</span></td>
+                    <td className="px-4 py-3 text-right">
+                      <select value={o.estado} onChange={e=>updateStatus(o.id,e.target.value)}
+                        className="bg-dark-2 border border-white/10 text-white text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand/60">
+                        {ESTADOS_ORDER.map(s=><option key={s}>{s}</option>)}
+                      </select>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        {filtered.length>0 && (
+          <div className="px-4 py-3 border-t border-white/5 flex justify-between text-xs text-white/30">
+            <span>Total visible: <span className="text-brand font-semibold">{fmt(filtered.reduce((s,o)=>s+Number(o.precio||o.total||0)*Number(o.cantidad||1),0))}</span></span>
+            <span>{filtered.length} de {orders.length}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Modal pedido manual */}
+      {orderModal && <OrderModal onSave={handleCreateOrder} onClose={()=>setOrderModal(false)}/>}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   MODAL PRODUCTO (crear / editar)
+   ════════════════════════════════════════════════ */
+function ProductModal({product, onSave, onClose}) {
+  const isNew = !product;
+  const imgRef = useRef(null);
+  const blank = {id:Date.now(),cat:'arroces',name:'',price:'',unit:'ud',minR:'',desc:'',al:[],top:false,active:true,img:'',imgData:''};
+  const [form, setForm] = useState(product ? {...product, price:String(product.price), minR:String(product.minR||''), imgData:product.imgData||''} : blank);
+
+  const set = (k,v) => setForm(f=>({...f,[k]:v}));
+  const toggleAl = al => setForm(f=>({...f,al:f.al.includes(al)?f.al.filter(x=>x!==al):[...f.al,al]}));
+
+  const submit = () => {
+    if (!form.name.trim()) return;
+    const price = parseFloat(form.price);
+    if (isNaN(price)||price<0) return;
+    onSave({...form, price, minR: form.minR?parseInt(form.minR):null, id: form.id||Date.now()});
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark/80 backdrop-blur-sm" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="bg-dark-3 border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+          <h2 className="font-bold text-white">{isNew?'Añadir producto':'Editar producto'}</h2>
+          <button onClick={onClose} className="text-white/40 hover:text-white/80 text-xl leading-none">✕</button>
+        </div>
+        <div className="px-6 py-5 space-y-4">
+
+          {/* Nombre */}
+          <div>
+            <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Nombre *</label>
+            <input value={form.name} onChange={e=>set('name',e.target.value)} placeholder="Nombre del producto"
+              className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60"/>
+          </div>
+
+          {/* Categoría + Precio */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Categoría *</label>
+              <select value={form.cat} onChange={e=>set('cat',e.target.value)} className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60">
+                {CATS.map(c=><option key={c} value={c}>{CAT_LABELS[c]}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Precio (€) *</label>
+              <input type="number" step="0.10" min="0" value={form.price} onChange={e=>set('price',e.target.value)} placeholder="0.00"
+                className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60"/>
+            </div>
+          </div>
+
+          {/* Unidad + Mín. raciones */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Unidad</label>
+              <select value={form.unit} onChange={e=>set('unit',e.target.value)} className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60">
+                {UNITS.map(u=><option key={u}>{u}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Mín. raciones</label>
+              <input type="number" min="1" value={form.minR} onChange={e=>set('minR',e.target.value)} placeholder="Ej: 2"
+                className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60"/>
+            </div>
+          </div>
+
+          {/* Descripción */}
+          <div>
+            <label className="block text-xs text-white/40 uppercase tracking-wider mb-1.5">Descripción</label>
+            <textarea value={form.desc} onChange={e=>set('desc',e.target.value)} rows={2} placeholder="Descripción breve"
+              className="w-full bg-dark-2 border border-white/15 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand/60 resize-none"/>
+          </div>
+
+          {/* Alérgenos */}
+          <div>
+            <label className="block text-xs text-white/40 uppercase tracking-wider mb-2">Alérgenos</label>
+            <div className="flex flex-wrap gap-2">
+              {ALLERGENS.map(al=>(
+                <button key={al} onClick={()=>toggleAl(al)}
+                  className={`px-2.5 py-1 rounded-lg text-xs border transition-all ${form.al.includes(al)?'bg-brand/20 border-brand/50 text-brand':'bg-dark-2 border-white/10 text-white/40 hover:border-white/20'}`}>
+                  {al}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Flags */}
+          <div className="flex gap-6">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <Toggle checked={form.top} onChange={v=>set('top',v)}/>
+              <span className="text-sm text-white/60">Destacado ⭐</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <Toggle checked={form.active} onChange={v=>set('active',v)}/>
+              <span className="text-sm text-white/60">Activo</span>
+            </label>
+          </div>
+
+          {/* Fotografía */}
+          <div>
+            <label className="block text-xs text-white/40 uppercase tracking-wider mb-2">Fotografía del producto</label>
+            <div className="flex gap-4 items-start">
+              <div className="w-20 h-20 rounded-xl border border-white/10 overflow-hidden flex-shrink-0 flex items-center justify-center bg-dark-2 text-3xl text-white/20">
+                {form.imgData
+                  ? <img src={form.imgData} alt="preview" className="w-full h-full object-cover"/>
+                  : '🍽️'}
+              </div>
+              <div className="flex-1">
+                <input ref={imgRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+                  onChange={e=>{
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = ev => set('imgData', ev.target.result);
+                    reader.readAsDataURL(file);
+                    e.target.value = '';
+                  }}/>
+                <button type="button" onClick={()=>imgRef.current?.click()}
+                  className="w-full border border-dashed border-white/20 hover:border-brand/50 rounded-xl py-2.5 text-sm text-white/40 hover:text-white/70 transition-colors">
+                  {form.imgData ? '🔄 Cambiar imagen' : '📷 Subir imagen'}
+                </button>
+                <p className="text-xs text-white/25 mt-1.5">Recomendado: <span className="text-white/40">800 × 600 px</span> · Peso máx.: <span className="text-white/40">500 KB</span> · JPG, PNG o WebP</p>
+                {form.imgData && (
+                  <button type="button" onClick={()=>set('imgData','')} className="text-xs text-red-400/50 hover:text-red-400 mt-1 transition-colors">
+                    ✕ Quitar imagen
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-4 border-t border-white/10 flex gap-3 justify-end">
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm text-white/50 hover:text-white/80 border border-white/10 hover:border-white/20 transition-colors">Cancelar</button>
+          <button onClick={submit} className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-light text-dark font-semibold text-sm transition-colors">
+            {isNew?'Crear producto':'Guardar cambios'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   TAB: CARTA (gestión de productos)
+   ════════════════════════════════════════════════ */
+function TabCarta({showToast}) {
+  const [products, setProducts] = useState(loadProducts);
+  const [search,   setSearch]   = useState('');
+  const [catFilter,setCatFilter] = useState('todos');
+  const [modal,    setModal]    = useState(null); // null | 'new' | product
+  const [confirm,  setConfirm]  = useState(null); // id a eliminar
+
+  useEffect(()=>{ saveProducts(products); },[products]);
+
+  const filtered = useMemo(()=>{
+    let l = catFilter==='todos' ? products : products.filter(p=>p.cat===catFilter);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      l = l.filter(p=>p.name.toLowerCase().includes(q)||CAT_LABELS[p.cat]?.toLowerCase().includes(q));
+    }
+    return l;
+  },[products,catFilter,search]);
+
+  const stats = useMemo(()=>({
+    total:     products.length,
+    activos:   products.filter(p=>p.active!==false).length,
+    inactivos: products.filter(p=>p.active===false).length,
+    favoritos: products.filter(p=>p.top===true).length,
+  }),[products]);
+
+  const handleSave = (prod) => {
+    setProducts(prev=>{
+      const idx = prev.findIndex(p=>p.id===prod.id);
+      if (idx>=0) { const n=[...prev]; n[idx]=prod; return n; }
+      return [...prev, prod];
+    });
+    showToast(modal==='new'?`"${prod.name}" creado`:`"${prod.name}" actualizado`,'ok');
+    setModal(null);
+  };
+
+  const handleDelete = (id) => {
+    const p = products.find(x=>x.id===id);
+    setProducts(prev=>prev.filter(x=>x.id!==id));
+    showToast(`"${p?.name}" eliminado`,'info');
+    setConfirm(null);
+  };
+
+  const handleToggle = (id, active) => {
+    setProducts(prev=>prev.map(p=>p.id===id?{...p,active}:p));
+  };
+
+  const handleTop = (id) => {
+    setProducts(prev=>prev.map(p=>p.id===id?{...p,top:!p.top}:p));
+  };
+
+  const handlePrice = (id, val) => {
+    const price = parseFloat(val);
+    if (!isNaN(price) && price>=0) setProducts(prev=>prev.map(p=>p.id===id?{...p,price}:p));
+  };
+
+  return (
+    <div className="space-y-5">
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[['Total productos',stats.total,'text-white'],['Activos',stats.activos,'text-green-300'],['Inactivos',stats.inactivos,'text-red-300'],['Favoritos',stats.favoritos,'text-yellow-300']].map(([l,v,c])=>(
+          <div key={l} className="bg-dark-3 border border-white/5 rounded-xl p-4">
+            <div className="text-xs text-white/40 uppercase tracking-wider mb-1">{l}</div>
+            <div className={`text-2xl font-bold ${c}`}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Barra de acciones */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path strokeLinecap="round" d="m21 21-4.35-4.35"/></svg>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar producto…"
+            className="w-full bg-dark-3 border border-white/10 rounded-xl pl-9 pr-8 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-brand/50"/>
+          {search && <button onClick={()=>setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60">✕</button>}
+        </div>
+        <select value={catFilter} onChange={e=>setCatFilter(e.target.value)}
+          className="bg-dark-3 border border-white/10 text-white text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-brand/50">
+          <option value="todos">Todas las categorías</option>
+          {CATS.map(c=><option key={c} value={c}>{CAT_LABELS[c]}</option>)}
+        </select>
+        <button onClick={()=>setModal('new')}
+          className="flex items-center gap-2 bg-brand hover:bg-brand-light text-dark font-semibold text-sm px-4 py-2.5 rounded-xl transition-colors whitespace-nowrap">
+          <span className="text-lg leading-none">+</span> Nuevo producto
+        </button>
+      </div>
+
+      {/* Tabla productos */}
+      <div className="bg-dark-2 border border-white/5 rounded-2xl overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/5">
+          <span className="text-xs text-white/40">{filtered.length} producto{filtered.length!==1?'s':''} {catFilter!=='todos'?`· ${CAT_LABELS[catFilter]}`:''}</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[780px]">
+            <thead className="bg-dark-3 border-b border-white/5">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/40">Producto</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/40 hidden sm:table-cell">Categoría</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/40">Precio</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-yellow-400/60">⭐ Fav.</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-white/40">Activo</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-white/40">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {filtered.length===0
+                ? <tr><td colSpan="6" className="px-4 py-12 text-center text-white/30 text-sm">No se encontraron productos</td></tr>
+                : filtered.map(p=>(
+                  <tr key={p.id} className={`transition-colors hover:bg-white/[0.02] ${p.active===false?'opacity-50':''}`}>
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-sm text-white flex items-center gap-2">
+                        {p.top && <span className="text-xs" title="Destacado">⭐</span>}
+                        {p.name}
+                      </div>
+                      {p.desc && <div className="text-xs text-white/30 mt-0.5 truncate max-w-xs">{p.desc}</div>}
+                      {p.al?.length>0 && <div className="text-xs text-amber-500/60 mt-0.5">{p.al.slice(0,3).join(', ')}{p.al.length>3?` +${p.al.length-3}`:''}</div>}
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <span className="text-xs bg-white/8 border border-white/10 px-2 py-1 rounded-lg text-white/60">{CAT_LABELS[p.cat]||p.cat}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number" step="0.10" min="0"
+                          defaultValue={Number(p.price).toFixed(2)}
+                          onBlur={e=>handlePrice(p.id,e.target.value)}
+                          onKeyDown={e=>e.key==='Enter'&&e.target.blur()}
+                          className="w-20 bg-dark border border-white/15 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:border-brand/60 text-right"
+                        />
+                        <span className="text-xs text-white/30">€/{p.unit||'ud'}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={()=>handleTop(p.id)}
+                        title={p.top?'Quitar de favoritos':'Marcar como favorito'}
+                        className="text-xl leading-none transition-transform hover:scale-125 focus:outline-none"
+                      >
+                        {p.top ? '⭐' : <span className="text-white/20 hover:text-yellow-300/60">☆</span>}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex justify-center">
+                        <Toggle checked={p.active!==false} onChange={v=>handleToggle(p.id,v)}/>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center gap-2 justify-end">
+                        <button onClick={()=>setModal(p)}
+                          className="text-xs text-white/40 hover:text-white/80 border border-white/10 hover:border-white/25 px-2.5 py-1.5 rounded-lg transition-colors">
+                          Editar
+                        </button>
+                        <button onClick={()=>setConfirm(p.id)}
+                          className="text-xs text-red-400/60 hover:text-red-400 border border-red-400/20 hover:border-red-400/40 px-2.5 py-1.5 rounded-lg transition-colors">
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal editar/crear */}
+      {modal && (
+        <ProductModal
+          product={modal==='new'?null:modal}
+          onSave={handleSave}
+          onClose={()=>setModal(null)}
+        />
+      )}
+
+      {/* Confirm eliminar */}
+      {confirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark/80 backdrop-blur-sm">
+          <div className="bg-dark-3 border border-white/10 rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <div className="text-3xl mb-3">🗑️</div>
+            <h3 className="font-bold text-white mb-2">¿Eliminar producto?</h3>
+            <p className="text-sm text-white/50 mb-6">Esta acción no se puede deshacer. El producto desaparecerá de la web.</p>
+            <div className="flex gap-3">
+              <button onClick={()=>setConfirm(null)} className="flex-1 py-2.5 rounded-xl border border-white/15 text-white/60 hover:text-white/80 text-sm transition-colors">Cancelar</button>
+              <button onClick={()=>handleDelete(confirm)} className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-400 text-white font-semibold text-sm transition-colors">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   APP PRINCIPAL
+   ════════════════════════════════════════════════ */
+function ReviewModal({data, onSave, onClose}) {
+  const [form, setForm] = React.useState(data);
+  const set = (k,v) => setForm(f=>({...f,[k]:v}));
+  function handleAuthor(val) {
+    const parts = val.trim().split(/\s+/);
+    const ini = parts.length>=2 ? (parts[0][0]+parts[parts.length-1][0]).toUpperCase() : val.slice(0,2).toUpperCase();
+    setForm(f=>({...f,author:val,initials:ini}));
+  }
+  return (
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="bg-[#1a1108] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-5 border-b border-white/10">
+          <h3 className="text-white font-bold text-lg">{form.id?'Editar reseña':'Nueva reseña'}</h3>
+          <button onClick={onClose} className="text-white/40 hover:text-white text-2xl leading-none">×</button>
+        </div>
+        <div className="p-5 flex flex-col gap-4">
+          <div>
+            <label className="text-white/50 text-xs font-semibold uppercase tracking-wide block mb-2">Valoración</label>
+            <div className="flex gap-2">
+              {[1,2,3,4,5].map(n=>(
+                <button key={n} onClick={()=>set('stars',n)}
+                  className={`text-2xl transition-transform hover:scale-110 ${n<=form.stars?'text-yellow-400':'text-white/20'}`}>★</button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-white/50 text-xs font-semibold uppercase tracking-wide block mb-1">Texto de la reseña</label>
+            <textarea value={form.text} onChange={e=>set('text',e.target.value)} rows={4}
+              className="w-full bg-white/5 border border-white/15 text-white rounded-lg p-3 text-sm resize-none focus:outline-none focus:border-brand"
+              placeholder="Escribe la reseña..."/>
+          </div>
+          <div>
+            <label className="text-white/50 text-xs font-semibold uppercase tracking-wide block mb-1">Nombre del autor</label>
+            <input value={form.author} onChange={e=>handleAuthor(e.target.value)}
+              className="w-full bg-white/5 border border-white/15 text-white rounded-lg p-3 text-sm focus:outline-none focus:border-brand"
+              placeholder="María L."/>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-white/50 text-xs font-semibold uppercase tracking-wide block mb-1">Iniciales</label>
+              <input value={form.initials} onChange={e=>set('initials',e.target.value.toUpperCase().slice(0,3))} maxLength={3}
+                className="w-full bg-white/5 border border-white/15 text-white rounded-lg p-3 text-sm focus:outline-none focus:border-brand"
+                placeholder="ML"/>
+            </div>
+            <div>
+              <label className="text-white/50 text-xs font-semibold uppercase tracking-wide block mb-1">Fecha · Local</label>
+              <input value={form.meta} onChange={e=>set('meta',e.target.value)}
+                className="w-full bg-white/5 border border-white/15 text-white rounded-lg p-3 text-sm focus:outline-none focus:border-brand"
+                placeholder="Marzo 2026 · Ávila"/>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-3 p-5 border-t border-white/10">
+          <button onClick={onClose} className="flex-1 border border-white/15 text-white/60 rounded-lg py-2.5 text-sm hover:border-white/30 transition-colors">Cancelar</button>
+          <button onClick={()=>{ if(form.text.trim()&&form.author.trim()) onSave(form); }}
+            className="flex-1 bg-brand text-white rounded-lg py-2.5 text-sm font-semibold hover:opacity-80 transition-opacity">
+            {form.id?'Guardar cambios':'Añadir reseña'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TabReseñas({showToast}) {
+  const BLANK = {stars:5,text:'',author:'',initials:'',meta:''};
+  const [reviews, setReviews] = React.useState(()=>
+    JSON.parse(localStorage.getItem(REVIEWS_KEY)||'null') || DEFAULT_REVIEWS
+  );
+  const [modal, setModal] = React.useState(null);
+
+  function save(list) {
+    localStorage.setItem(REVIEWS_KEY, JSON.stringify(list));
+    setReviews(list);
+  }
+  function handleDelete(id) { save(reviews.filter(r=>r.id!==id)); showToast('Reseña eliminada'); }
+  function handleSave(data) {
+    const list = data.id ? reviews.map(r=>r.id===data.id?data:r) : [...reviews,{...data,id:Date.now()}];
+    save(list);
+    showToast(data.id?'Reseña actualizada':'Reseña añadida');
+    setModal(null);
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-white font-bold text-xl">Reseñas</h2>
+          <p className="text-white/40 text-sm mt-1">{reviews.length} reseña{reviews.length!==1?'s':''} publicada{reviews.length!==1?'s':''}</p>
+        </div>
+        <button onClick={()=>setModal({data:{...BLANK}})}
+          className="bg-brand text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80 transition-opacity">
+          + Nueva reseña
+        </button>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {reviews.map(r=>(
+          <div key={r.id} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col">
+            <div className="text-yellow-400 text-base mb-2">{'★'.repeat(r.stars)}{'☆'.repeat(5-r.stars)}</div>
+            <p className="text-white/65 text-sm italic mb-3 flex-1">"{r.text}"</p>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{r.initials}</div>
+              <div>
+                <div className="text-white text-sm font-semibold">{r.author}</div>
+                <div className="text-white/40 text-xs">{r.meta}</div>
+              </div>
+            </div>
+            <div className="flex gap-2 border-t border-white/10 pt-3">
+              <button onClick={()=>setModal({data:{...r}})}
+                className="flex-1 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 rounded-lg py-1.5 transition-colors">✏️ Editar</button>
+              <button onClick={()=>handleDelete(r.id)}
+                className="flex-1 text-xs text-red-400/70 hover:text-red-400 border border-white/10 hover:border-red-400/30 rounded-lg py-1.5 transition-colors">🗑 Eliminar</button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {modal && <ReviewModal data={modal.data} onSave={handleSave} onClose={()=>setModal(null)}/>}
+    </div>
+  );
+}
+
+function App() {
+  const [authed, setAuthed] = useState(()=> localStorage.getItem(AUTH_KEY)==='1');
+  const [tab,    setTab]    = useState('pedidos');
+  const [toast,  setToast]  = useState(null);
+
+  const showToast = useCallback((msg, type='ok')=>{
+    setToast({msg,type});
+    setTimeout(()=>setToast(null),2800);
+  },[]);
+
+  const logout = () => {
+    localStorage.removeItem(AUTH_KEY);
+    window.location.href = 'arrozencaja_v4.html';
+  };
+
+  if (!authed) return <LoginScreen onAuth={()=>setAuthed(true)}/>;
+
+  const TABS = [
+    {id:'pedidos',  label:'📋 Pedidos'},
+    {id:'carta',    label:'🍽️ Carta'},
+    {id:'reseñas',  label:'⭐ Reseñas'},
+  ];
+
+  return (
+    <div className="min-h-screen bg-dark text-white">
+      {/* Topbar */}
+      <header className="sticky top-0 z-40 bg-dark/95 backdrop-blur border-b border-white/5 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <a href="index.html" className="font-bold text-lg tracking-tight hover:opacity-80 transition-opacity">
+            arroz<span className="text-brand">·en·</span>caja
+          </a>
+          <span className="hidden sm:block text-white/20">|</span>
+          <span className="hidden sm:block text-sm text-white/50">Administración</span>
+        </div>
+        <button onClick={logout} className="text-xs text-white/30 hover:text-white/60 border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-lg transition-colors">
+          ← Salir
+        </button>
+      </header>
+
+      {/* Tabs */}
+      <div className="border-b border-white/5 px-4 sm:px-6">
+        <div className="flex gap-1 max-w-7xl mx-auto">
+          {TABS.map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)}
+              className={`px-4 py-3 text-sm font-medium transition-all border-b-2 -mb-px ${tab===t.id?'border-brand text-white':'border-transparent text-white/40 hover:text-white/70'}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Contenido */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        {tab==='pedidos'  && <TabPedidos  showToast={showToast}/>}
+        {tab==='carta'    && <TabCarta    showToast={showToast}/>}
+        {tab==='reseñas'  && <TabReseñas  showToast={showToast}/>}
+      </main>
+
+      <Toast toast={toast}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
