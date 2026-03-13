@@ -1136,6 +1136,7 @@ function loadProductOverrides() {
         if (sp.top     !== undefined) p.top     = sp.top;
         if (sp.imgUrl  !== undefined) p.imgUrl  = sp.imgUrl;
         if (sp.imgData !== undefined) p.imgData = sp.imgData;
+        if (sp.imgPos  !== undefined) p.imgPos  = sp.imgPos;
         productActive[p.id] = sp.active !== false;
       } else {
         // Producto nuevo creado desde el admin
@@ -1323,7 +1324,7 @@ function productCard(p) {
 
   return `<article class="p-card${productActive[p.id]===false?' inactive':''}">
     <div class="p-img">
-      <img src="${img}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src=IMGS._fallback"/>
+      <img src="${img}" alt="${p.name}" loading="lazy" style="object-position:${p.imgPos||'center center'}" onerror="this.onerror=null;this.src=IMGS._fallback"/>
       ${isRaciones ? `<span class="p-min">Mín. ${p.minR} rac.</span>` : ''}
     </div>
     <div class="p-body">
@@ -1377,7 +1378,7 @@ function renderTop() {
     const priceStr = p.minR ? `${p.price.toFixed(2).replace('.',',')}€/rac` : `${p.price.toFixed(2).replace('.',',')}€`;
     return `<div class="top-card" onclick="setFilter('${p.cat}');document.getElementById('carta').scrollIntoView({behavior:'smooth'})">
       <div class="top-card-img">
-        <img src="${img}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src=IMGS._fallback"/>
+        <img src="${img}" alt="${p.name}" loading="lazy" style="object-position:${p.imgPos||'center center'}" onerror="this.onerror=null;this.src=IMGS._fallback"/>
         <span class="top-badge">⭐ Más pedido</span>
       </div>
       <div class="top-body">
