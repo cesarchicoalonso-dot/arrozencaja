@@ -1108,6 +1108,7 @@ function loadProductOverrides() {
         if (sp.desc    !== undefined) p.desc    = sp.desc;
         if (sp.al      !== undefined) p.al      = sp.al;
         if (sp.top     !== undefined) p.top     = sp.top;
+        if (sp.imgUrl  !== undefined) p.imgUrl  = sp.imgUrl;
         if (sp.imgData !== undefined) p.imgData = sp.imgData;
         productActive[p.id] = sp.active !== false;
       } else {
@@ -1270,7 +1271,7 @@ function loadMore() {
 }
 
 function productCard(p) {
-  const img = p.imgData || IMGS[p.img] || IMGS[p.cat] || IMGS.extras || IMGS._fallback;
+  const img = p.imgUrl || p.imgData || IMGS[p.img] || IMGS[p.cat] || IMGS.extras || IMGS._fallback;
   const allergenHTML = p.al.length ? p.al.map(a => `<span class="allergen">${ALLERGEN_ICONS[a]||'⚠'} ${a}</span>`).join('') : '';
   const isRaciones = !!p.minR;
   const unitLabel = isRaciones ? `${p.price.toFixed(2).replace('.',',')}€/rac` : `${p.price.toFixed(2).replace('.',',')}€`;
@@ -1346,7 +1347,7 @@ function renderTop() {
   if (!tops.length) { if (section) section.style.display = 'none'; return; }
   if (section) section.style.display = '';
   grid.innerHTML = tops.map(p => {
-    const img = p.imgData || IMGS[p.img] || IMGS[p.cat] || IMGS.extras;
+    const img = p.imgUrl || p.imgData || IMGS[p.img] || IMGS[p.cat] || IMGS.extras || IMGS._fallback;
     const priceStr = p.minR ? `${p.price.toFixed(2).replace('.',',')}€/rac` : `${p.price.toFixed(2).replace('.',',')}€`;
     return `<div class="top-card" onclick="setFilter('${p.cat}');document.getElementById('carta').scrollIntoView({behavior:'smooth'})">
       <div class="top-card-img">
@@ -1966,13 +1967,24 @@ function showToast(msg) {
 }
 
 // ─── INIT ────────────────────────────────────────────────────────
+// Intenta cargar productos.json (archivo del repo) antes de usar localStorage.
+// Workflow: edita en admin → "Exportar .json" → sube al repo → git push.
 initProductStorage();
-loadProductOverrides();
-loadCart();
-renderProducts();
-renderCart();
-renderTop();
-renderReviews();
+(async () => {
+  try {
+    const r = await fetch('./productos.json', {cache: 'no-store'});
+    if (r.ok) {
+      const data = await r.json();
+      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(data));
+    }
+  } catch(_) { /* sin productos.json → usa localStorage */ }
+  loadProductOverrides();
+  loadCart();
+  renderProducts();
+  renderCart();
+  renderTop();
+  renderReviews();
+})();
 
 // sticky filter offset
 const filterWrap = document.getElementById('filtros');

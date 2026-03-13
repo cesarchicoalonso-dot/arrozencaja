@@ -1,0 +1,984 @@
+[
+  {
+    "id": 1,
+    "cat": "arroces",
+    "img": "setas",
+    "name": "Arroz Pinícola (Setas y Boletus)",
+    "price": 17,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, fondo de verduras, setas y boletus",
+    "al": [
+      "Sulfitos",
+      "Apio"
+    ],
+    "top": false,
+    "active": true,
+    "imgUrl": "img\\productos\\Arroz-Pinicola.jpg"
+  },
+  {
+    "id": 2,
+    "cat": "arroces",
+    "img": "tinta",
+    "name": "Arroz de Tinta",
+    "price": 15.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, calamar, gambas, tinta de calamar",
+    "al": [
+      "Crustáceos",
+      "Moluscos",
+      "Pescado"
+    ],
+    "top": false,
+    "active": true,
+    "imgUrl": ""
+  },
+  {
+    "id": 3,
+    "cat": "arroces",
+    "img": "carne",
+    "name": "Arroz Internacional",
+    "price": 16.9,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, pechuga de pato, judiones y foie",
+    "al": [
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 4,
+    "cat": "arroces",
+    "img": "marisco",
+    "name": "Arroz Castita y Galán",
+    "price": 14.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, gambitas peladas y calamar",
+    "al": [
+      "Crustáceos",
+      "Moluscos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 5,
+    "cat": "arroces",
+    "img": "paella",
+    "name": "Arroz Tricantino",
+    "price": 15.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, caldo de marisco, gambas, calamar",
+    "al": [
+      "Crustáceos",
+      "Moluscos",
+      "Gluten"
+    ],
+    "top": true,
+    "active": true
+  },
+  {
+    "id": 6,
+    "cat": "arroces",
+    "img": "verduras",
+    "name": "Arroz de la Huerta",
+    "price": 12.9,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, verduras variadas y garbanzos. Vegano",
+    "al": [
+      "Apio"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 7,
+    "cat": "arroces",
+    "img": "setas",
+    "name": "Risotto de Verduras y Hongos",
+    "price": 13.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, hongos de temporada y parmesano",
+    "al": [
+      "Lácteos",
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 8,
+    "cat": "arroces",
+    "img": "carne",
+    "name": "Arroz Dehesa Extremeña",
+    "price": 15.9,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, pluma, costilla y solomillo ibérico",
+    "al": [
+      "Soja",
+      "Sulfitos",
+      "Apio"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 9,
+    "cat": "arroces",
+    "img": "pollo",
+    "name": "Arroz de Granja y Caracoles",
+    "price": 15.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, pollo de corral y caracoles",
+    "al": [
+      "Gluten",
+      "Moluscos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 10,
+    "cat": "arroces",
+    "img": "pollo",
+    "name": "Arroz Latino",
+    "price": 14.9,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, pechuga, maíz dulce y aguacate",
+    "al": [],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 11,
+    "cat": "arroces",
+    "img": "bogavante",
+    "name": "Arroz de Bogavante",
+    "price": 19,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, bogavante canadiense y caldo de marisco",
+    "al": [
+      "Crustáceos",
+      "Moluscos",
+      "Sulfitos"
+    ],
+    "top": true,
+    "active": true
+  },
+  {
+    "id": 12,
+    "cat": "arroces",
+    "img": "pollo",
+    "name": "Arroz de Pollo y Maíz",
+    "price": 13.9,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, pollo deshuesado, maíz y garbanzos",
+    "al": [
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 13,
+    "cat": "arroces",
+    "img": "pescado",
+    "name": "Arroz con Bacalao Atlántico",
+    "price": 17.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, bacalao atlántico y espinacas",
+    "al": [
+      "Pescado",
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 14,
+    "cat": "arroces",
+    "img": "pulpo",
+    "name": "Arroz de Pulpo a Feira",
+    "price": 16.9,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, pulpo gallego y pimentón de la Vera",
+    "al": [
+      "Moluscos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 15,
+    "cat": "arroces",
+    "img": "marisco",
+    "name": "Arroz de Mariskito",
+    "price": 19,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, marisco variado y rosada",
+    "al": [
+      "Crustáceos",
+      "Moluscos",
+      "Pescado"
+    ],
+    "top": true,
+    "active": true
+  },
+  {
+    "id": 16,
+    "cat": "arroces",
+    "img": "carne",
+    "name": "Arroz Tierra de Toros",
+    "price": 16.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, rabo de toro deshuesado",
+    "al": [
+      "Gluten",
+      "Sulfitos",
+      "Apio"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 17,
+    "cat": "arroces",
+    "img": "carne",
+    "name": "Arroz de Manitas Raza Duroc",
+    "price": 17,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, manitas de cerdo Duroc",
+    "al": [
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 18,
+    "cat": "arroces",
+    "img": "paella",
+    "name": "Arroz Secreto",
+    "price": 16.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Nuestra receta estrella",
+    "al": [
+      "Gluten",
+      "Crustáceos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 19,
+    "cat": "arroces",
+    "img": "pollo",
+    "name": "Arroz Pollo Halal",
+    "price": 13.9,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, caldo de ave y pollo halal deshuesado",
+    "al": [
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 20,
+    "cat": "fideuas",
+    "img": "carne",
+    "name": "Fideuá de Rabo de Toro",
+    "price": 15,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, rabo de toro y fideos tostados",
+    "al": [
+      "Gluten",
+      "Sulfitos",
+      "Apio"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 21,
+    "cat": "fideuas",
+    "img": "tinta",
+    "name": "Fideuá de Tinta",
+    "price": 15.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, calamar, gambas y tinta de calamar",
+    "al": [
+      "Crustáceos",
+      "Moluscos",
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 22,
+    "cat": "fideuas",
+    "img": "verduras",
+    "name": "Fideuá de Verduras",
+    "price": 15,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, verduras y fideo tostado",
+    "al": [
+      "Gluten",
+      "Apio"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 23,
+    "cat": "fideuas",
+    "img": "pollo",
+    "name": "Fideuá de Pollo y Maíz",
+    "price": 14,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, pollo y fideo tostado",
+    "al": [
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 24,
+    "cat": "fideuas",
+    "img": "carne",
+    "name": "Fideuá Dehesa Extremeña",
+    "price": 14.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, ibérico y fideo tostado",
+    "al": [
+      "Gluten",
+      "Sulfitos",
+      "Apio"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 25,
+    "cat": "fideuas",
+    "img": "marisco",
+    "name": "Fideuá Marinera",
+    "price": 14.5,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Sofrito natural, gambas, sepia y fideos finos",
+    "al": [
+      "Crustáceos",
+      "Moluscos",
+      "Pescado",
+      "Gluten"
+    ],
+    "top": true,
+    "active": true
+  },
+  {
+    "id": 54,
+    "cat": "smashburger",
+    "name": "Smash Burger Clásica",
+    "price": 9.9,
+    "unit": "ud",
+    "desc": "Doble smash de ternera, queso americano y salsa especial",
+    "al": [
+      "Gluten",
+      "Huevos",
+      "Lácteos",
+      "Mostaza"
+    ],
+    "top": true,
+    "active": true
+  },
+  {
+    "id": 55,
+    "cat": "smashburger",
+    "name": "Smash Burger Bacon",
+    "price": 11.5,
+    "unit": "ud",
+    "desc": "Doble smash, bacon crujiente y cheddar fundido",
+    "al": [
+      "Gluten",
+      "Lácteos",
+      "Mostaza"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 56,
+    "cat": "smashburger",
+    "name": "Smash Burger Vegana",
+    "price": 10.5,
+    "unit": "ud",
+    "desc": "Base de garbanzos, aguacate, tomate y alioli vegano",
+    "al": [
+      "Gluten",
+      "Mostaza"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 57,
+    "cat": "smashburger",
+    "name": "Smash Burger Doble",
+    "price": 13.9,
+    "unit": "ud",
+    "desc": "Triple smash, doble cheddar, bacon y salsa BBQ",
+    "al": [
+      "Gluten",
+      "Huevos",
+      "Lácteos",
+      "Mostaza"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 58,
+    "cat": "smashburger",
+    "name": "Patatas Smash",
+    "price": 4.5,
+    "unit": "ud",
+    "desc": "Patatas fritas crujientes con salsa especial",
+    "al": [
+      "Huevos",
+      "Mostaza"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 59,
+    "cat": "lepain",
+    "name": "Bocadillo de Calamares",
+    "price": 7.9,
+    "unit": "ud",
+    "desc": "Pan artesano, calamares frescos y alioli casero",
+    "al": [
+      "Gluten",
+      "Huevos",
+      "Moluscos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 60,
+    "cat": "lepain",
+    "name": "Pan de Ajo",
+    "price": 3.9,
+    "unit": "ud",
+    "desc": "Pan artesano con mantequilla de ajo y perejil",
+    "al": [
+      "Gluten",
+      "Lácteos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 61,
+    "cat": "lepain",
+    "name": "Tosta de Jamón Ibérico",
+    "price": 8.5,
+    "unit": "ud",
+    "desc": "Pan de cristal, jamón ibérico y tomate natural",
+    "al": [
+      "Gluten",
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 62,
+    "cat": "lepain",
+    "name": "Bocadillo Vegetal",
+    "price": 6.9,
+    "unit": "ud",
+    "desc": "Pan integral, hummus, rúcula y aguacate",
+    "al": [
+      "Gluten",
+      "Sésamo"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 63,
+    "cat": "kajita",
+    "name": "K@jita de Pollo",
+    "price": 9.9,
+    "unit": "ud",
+    "desc": "Muslos de pollo en adobo, arroz blanco y ensalada",
+    "al": [
+      "Gluten",
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 64,
+    "cat": "kajita",
+    "name": "K@jita de Costillas",
+    "price": 11.9,
+    "unit": "ud",
+    "desc": "Costillas glaseadas con miel y mostaza, con patatas",
+    "al": [
+      "Gluten",
+      "Mostaza",
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 65,
+    "cat": "kajita",
+    "name": "K@jita Vegana",
+    "price": 8.9,
+    "unit": "ud",
+    "desc": "Tofu marinado, quinoa, verduras asadas y tahini",
+    "al": [
+      "Sésamo"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 66,
+    "cat": "empanadas",
+    "name": "Empanada de Carne",
+    "price": 3.5,
+    "unit": "ud",
+    "desc": "Masa casera rellena de carne picada y especias",
+    "al": [
+      "Gluten",
+      "Huevos"
+    ],
+    "top": true,
+    "active": true
+  },
+  {
+    "id": 67,
+    "cat": "empanadas",
+    "name": "Empanada de Pollo",
+    "price": 3.5,
+    "unit": "ud",
+    "desc": "Masa casera rellena de pechuga de pollo y verduras",
+    "al": [
+      "Gluten",
+      "Huevos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 68,
+    "cat": "empanadas",
+    "name": "Empanada Espinacas y Queso",
+    "price": 3.5,
+    "unit": "ud",
+    "desc": "Masa casera rellena de espinacas y queso fundido",
+    "al": [
+      "Gluten",
+      "Huevos",
+      "Lácteos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 69,
+    "cat": "empanadas",
+    "name": "Pack 6 Empanadas Mixtas",
+    "price": 19,
+    "unit": "ud",
+    "desc": "6 empanadas a elegir entre carne, pollo y espinacas",
+    "al": [
+      "Gluten",
+      "Huevos",
+      "Lácteos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 28,
+    "cat": "asados",
+    "name": "Lechazo Asado",
+    "price": 22.9,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Lechazo asado al horno de leña con patatas panaderas",
+    "al": [
+      "Gluten",
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 29,
+    "cat": "asados",
+    "name": "Cochinillo Asado",
+    "price": 21.9,
+    "unit": "rac",
+    "minR": 2,
+    "desc": "Cochinillo segoviano asado a baja temperatura",
+    "al": [],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 30,
+    "cat": "asados",
+    "name": "Pollo Asado",
+    "price": 14.9,
+    "unit": "ud",
+    "desc": "Pollo de corral entero asado con ajo y limón",
+    "al": [],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 31,
+    "cat": "asados",
+    "name": "Costillar de Cerdo",
+    "price": 18.9,
+    "unit": "ud",
+    "desc": "Costillar a la brasa con salsa BBQ y ensalada",
+    "al": [
+      "Gluten",
+      "Mostaza",
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 32,
+    "cat": "postres",
+    "name": "Tarta de Queso",
+    "price": 5.9,
+    "unit": "ud",
+    "desc": "Tarta de queso al horno estilo La Viña",
+    "al": [
+      "Gluten",
+      "Huevos",
+      "Lácteos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 33,
+    "cat": "postres",
+    "name": "Brownie con Helado",
+    "price": 6.5,
+    "unit": "ud",
+    "desc": "Brownie de chocolate negro con helado de vainilla",
+    "al": [
+      "Gluten",
+      "Huevos",
+      "Lácteos",
+      "Frutos secos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 34,
+    "cat": "postres",
+    "name": "Flan Casero",
+    "price": 4.9,
+    "unit": "ud",
+    "desc": "Flan de huevo casero con caramelo artesano",
+    "al": [
+      "Huevos",
+      "Lácteos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 35,
+    "cat": "postres",
+    "name": "Natillas de la Abuela",
+    "price": 4.5,
+    "unit": "ud",
+    "desc": "Natillas cremosas con canela y galleta María",
+    "al": [
+      "Gluten",
+      "Huevos",
+      "Lácteos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 36,
+    "cat": "bebidas",
+    "name": "Agua 500ml",
+    "price": 1.5,
+    "unit": "ud",
+    "desc": "Agua mineral natural",
+    "al": [],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 37,
+    "cat": "bebidas",
+    "name": "Refresco lata",
+    "price": 2.5,
+    "unit": "ud",
+    "desc": "Coca-Cola, Fanta, Nestea o Schweppes",
+    "al": [],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 38,
+    "cat": "bebidas",
+    "name": "Cerveza Mahou 33cl",
+    "price": 2.9,
+    "unit": "ud",
+    "desc": "Cerveza Mahou 5 Estrellas bien fría",
+    "al": [
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 39,
+    "cat": "bebidas",
+    "name": "Limonada Casera",
+    "price": 3.5,
+    "unit": "ud",
+    "desc": "Limonada natural con hierbabuena y menta",
+    "al": [],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 40,
+    "cat": "vinos",
+    "name": "Vino Tinto D.O. Ribera",
+    "price": 12.9,
+    "unit": "bot",
+    "desc": "Ribera del Duero joven, frutoso y equilibrado",
+    "al": [
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 41,
+    "cat": "vinos",
+    "name": "Vino Blanco D.O. Rueda",
+    "price": 12.9,
+    "unit": "bot",
+    "desc": "Verdejo fresco y aromático",
+    "al": [
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 42,
+    "cat": "vinos",
+    "name": "Copa de Vino Tinto",
+    "price": 3.5,
+    "unit": "ud",
+    "desc": "Copa de vino tinto de la casa",
+    "al": [
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 43,
+    "cat": "vinos",
+    "name": "Vermú Rojo con Sifón",
+    "price": 4.9,
+    "unit": "ud",
+    "desc": "Vermú rojo artesano con aceitunas y naranja",
+    "al": [
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 44,
+    "cat": "vinos",
+    "name": "Cava Brut Nature",
+    "price": 16.9,
+    "unit": "bot",
+    "desc": "Cava catalán brut nature",
+    "al": [
+      "Sulfitos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 45,
+    "cat": "gourmet",
+    "name": "Croquetas de Jamón Ibérico (8 ud)",
+    "price": 9.9,
+    "unit": "ud",
+    "desc": "Bechamel casera con jamón ibérico de bellota",
+    "al": [
+      "Gluten",
+      "Huevos",
+      "Lácteos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 46,
+    "cat": "gourmet",
+    "name": "Tataki de Atún",
+    "price": 13.9,
+    "unit": "ud",
+    "desc": "Atún rojo a la plancha con vinagreta de soja",
+    "al": [
+      "Pescado",
+      "Sésamo",
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 47,
+    "cat": "gourmet",
+    "name": "Carpaccio de Gambas",
+    "price": 12.5,
+    "unit": "ud",
+    "desc": "Gambas rojas marinadas con aceite y limón",
+    "al": [
+      "Crustáceos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 48,
+    "cat": "gourmet",
+    "name": "Tartar de Ternera",
+    "price": 14.9,
+    "unit": "ud",
+    "desc": "Ternera a cuchillo, alcaparras y mostaza antigua",
+    "al": [
+      "Huevos",
+      "Mostaza"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 49,
+    "cat": "extras",
+    "name": "Ensalada de la Casa",
+    "price": 6.9,
+    "unit": "ud",
+    "desc": "Mezclum, tomate cherry, pepino y vinagreta",
+    "al": [
+      "Mostaza"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 50,
+    "cat": "extras",
+    "name": "Patatas Bravas",
+    "price": 5.5,
+    "unit": "ud",
+    "desc": "Patatas fritas con salsa brava y alioli",
+    "al": [
+      "Huevos",
+      "Mostaza"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 51,
+    "cat": "extras",
+    "name": "Gazpacho Casero (500ml)",
+    "price": 5.9,
+    "unit": "ud",
+    "desc": "Gazpacho andaluz con tomates maduros",
+    "al": [
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 52,
+    "cat": "extras",
+    "name": "Alioli Casero",
+    "price": 2,
+    "unit": "ud",
+    "desc": "Alioli de elaboración propia",
+    "al": [
+      "Huevos"
+    ],
+    "top": false,
+    "active": true
+  },
+  {
+    "id": 53,
+    "cat": "extras",
+    "name": "Pan de Mesa",
+    "price": 2.5,
+    "unit": "ud",
+    "desc": "Pan artesano de hogaza con AOVE",
+    "al": [
+      "Gluten"
+    ],
+    "top": false,
+    "active": true
+  }
+]
