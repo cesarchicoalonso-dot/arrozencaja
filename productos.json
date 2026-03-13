@@ -69,7 +69,9 @@
     ],
     "top": false,
     "active": true,
-    "imgUrl": "img\\productos\\Arroz-Castita-y-Galan.jpg"
+    "imgUrl": "img\\productos\\Arroz-Castita-y-Galan.jpg",
+    "imgPos": "50% 32%",
+    "imgZoom": 1
   },
   {
     "id": 5,
