@@ -420,7 +420,11 @@
       "Gluten"
     ],
     "top": true,
-    "active": true
+    "active": true,
+    "imgUrl": "img/productos/fideua-marinera.jpg",
+    "imgPos": "51% 48%",
+    "imgZoom": 1.3,
+    "imgUploading": false
   },
   {
     "id": 54,
