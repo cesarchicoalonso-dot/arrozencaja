@@ -590,7 +590,10 @@
       "Huevos"
     ],
     "top": true,
-    "active": true
+    "active": true,
+    "minR": null,
+    "imgUrl": "img/productos/empanadisimascarnesuave.jpg",
+    "imgUploading": false
   },
   {
     "id": 67,
