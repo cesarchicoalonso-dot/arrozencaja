@@ -253,7 +253,11 @@
       "Pescado"
     ],
     "top": true,
-    "active": true
+    "active": true,
+    "imgUrl": "img/productos/arroz-marisquito.jpg",
+    "imgPos": "47% 51%",
+    "imgZoom": 1,
+    "imgUploading": false
   },
   {
     "id": 16,
