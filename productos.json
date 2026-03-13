@@ -107,7 +107,11 @@
       "Apio"
     ],
     "top": false,
-    "active": true
+    "active": true,
+    "imgUrl": "img/productos/arroz-de-la-huerta.jpg",
+    "imgPos": "50% 62%",
+    "imgZoom": 1.3,
+    "imgUploading": false
   },
   {
     "id": 7,
