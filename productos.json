@@ -424,7 +424,12 @@
       "Mostaza"
     ],
     "top": true,
-    "active": true
+    "active": true,
+    "minR": null,
+    "imgUrl": "img/productos/basic_1_1024x1024.jpg",
+    "imgPos": "50% 85%",
+    "imgZoom": 1.1,
+    "imgUploading": false
   },
   {
     "id": 55,
