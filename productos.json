@@ -32,7 +32,8 @@
     ],
     "top": false,
     "active": true,
-    "imgUrl": ""
+    "imgUrl": "img/productos/arroz-de-tinta.jpg",
+    "imgUploading": false
   },
   {
     "id": 3,
